@@ -55,17 +55,17 @@ class backup_glossary_activity_task extends backup_activity_task {
     static public function encode_content_links($content) {
         global $CFG;
 
-        $base = preg_quote($CFG->wwwroot,"/");
+        $base = preg_quote($CFG->wwwroot, "/");
 
-        // Link to the list of glossaries
+        // Link to the list of glossaries.
         $search="/(".$base."\/mod\/glossary\/index.php\?id\=)([0-9]+)/";
         $content= preg_replace($search, '$@GLOSSARYINDEX*$2@$', $content);
 
-        // Link to glossary view by moduleid
+        // Link to glossary view by moduleid.
         $search="/(".$base."\/mod\/glossary\/view.php\?id\=)([0-9]+)/";
         $content= preg_replace($search, '$@GLOSSARYVIEWBYID*$2@$', $content);
 
-        // Link to glossary entry
+        // Link to glossary entry.
         $search="/(".$base."\/mod\/glossary\/showentry.php\?courseid=)([0-9]+)(&|&amp;)eid=([0-9]+)/";
         $content = preg_replace($search, '$@GLOSSARYSHOWENTRY*$2*$4@$', $content);
 

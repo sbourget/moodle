@@ -1,14 +1,36 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * This page is used to export glossary entries
+ *
+ * @package    mod_glossary
+ * @copyright  2003 onwards Williams Castillo (castillow@tutopia.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once('../../config.php');
 require_once('lib.php');
 
-$id       = required_param('id', PARAM_INT);          // Entry ID
-$confirm  = optional_param('confirm', 0, PARAM_BOOL); // export confirmation
+$id       = required_param('id', PARAM_INT);          // Entry ID.
+$confirm  = optional_param('confirm', 0, PARAM_BOOL); // Export confirmation.
 $prevmode = required_param('prevmode', PARAM_ALPHA);
 $hook     = optional_param('hook', '', PARAM_CLEAN);
 
-$url = new moodle_url('/mod/glossary/exportentry.php', array('id'=>$id,'prevmode'=>$prevmode));
+$url = new moodle_url('/mod/glossary/exportentry.php', array('id'=>$id, 'prevmode'=>$prevmode));
 if ($confirm !== 0) {
     $url->param('confirm', $confirm);
 }
@@ -22,7 +44,7 @@ if (!$entry = $DB->get_record('glossary_entries', array('id'=>$id))) {
 }
 
 if ($entry->sourceglossaryid) {
-    //already exported
+    // Already exported.
     if (!$cm = get_coursemodule_from_id('glossary', $entry->sourceglossaryid)) {
         print_error('invalidcoursemodule');
     }
@@ -48,7 +70,7 @@ require_capability('mod/glossary:export', $context);
 $returnurl = "view.php?id=$cm->id&amp;mode=$prevmode&amp;hook=".urlencode($hook);
 
 if (!$mainglossary = $DB->get_record('glossary', array('course'=>$cm->course, 'mainglossary'=>1))) {
-    //main glossary not present
+    // Main glossary not present.
     redirect($returnurl);
 }
 
@@ -65,8 +87,8 @@ if (!$course = $DB->get_record('course', array('id'=>$cm->course))) {
 
 
 $strglossaries     = get_string('modulenameplural', 'glossary');
-$entryalreadyexist = get_string('entryalreadyexist','glossary');
-$entryexported     = get_string('entryexported','glossary');
+$entryalreadyexist = get_string('entryalreadyexist', 'glossary');
+$entryexported     = get_string('entryexported', 'glossary');
 
 if (!$mainglossary->allowduplicatedentries) {
     if ($DB->record_exists_select('glossary_entries',
@@ -89,7 +111,8 @@ if (!data_submitted() or !$confirm or !confirm_sesskey()) {
     $PAGE->set_heading(format_string($course->fullname));
     echo $OUTPUT->header();
     echo '<div class="boxaligncenter">';
-    $areyousure = '<h2>'.format_string($entry->concept).'</h2><p align="center">'.get_string('areyousureexport','glossary').'<br /><b>'.format_string($mainglossary->name).'</b>?';
+    $areyousure = '<h2>'.format_string($entry->concept).'</h2><p align="center">'.
+                  get_string('areyousureexport', 'glossary').'<br /><b>'.format_string($mainglossary->name).'</b>?';
     $linkyes    = 'exportentry.php';
     $linkno     = 'view.php';
     $optionsyes = array('id'=>$entry->id, 'confirm'=>1, 'sesskey'=>sesskey(), 'prevmode'=>$prevmode, 'hook'=>$hook);
@@ -106,7 +129,7 @@ if (!data_submitted() or !$confirm or !confirm_sesskey()) {
 
     $DB->update_record('glossary_entries', $entry);
 
-    // move attachments too
+    // Move attachments too.
     $fs = get_file_storage();
 
     if ($oldfiles = $fs->get_area_files($context->id, 'mod_glossary', 'attachment', $entry->id)) {
@@ -124,4 +147,3 @@ if (!data_submitted() or !$confirm or !confirm_sesskey()) {
 
     redirect ($returnurl);
 }
-

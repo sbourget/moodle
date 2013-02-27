@@ -1,15 +1,37 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Glossary module delete entries
+ *
+ * @package    mod_glossary
+ * @copyright  2003 onwards Williams Castillo (castillow@tutopia.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once("../../config.php");
 require_once("lib.php");
 
-$id       = required_param('id', PARAM_INT);          // course module ID
-$confirm  = optional_param('confirm', 0, PARAM_INT);  // commit the operation?
-$entry    = optional_param('entry', 0, PARAM_INT);    // entry id
+$id       = required_param('id', PARAM_INT);          // Course module ID.
+$confirm  = optional_param('confirm', 0, PARAM_INT);  // Commit the operation?
+$entry    = optional_param('entry', 0, PARAM_INT);    // Entry id.
 $prevmode = required_param('prevmode', PARAM_ALPHA);
 $hook     = optional_param('hook', '', PARAM_CLEAN);
 
-$url = new moodle_url('/mod/glossary/deleteentry.php', array('id'=>$id,'prevmode'=>$prevmode));
+$url = new moodle_url('/mod/glossary/deleteentry.php', array('id'=>$id, 'prevmode'=>$prevmode));
 if ($confirm !== 0) {
     $url->param('confirm', $confirm);
 }
@@ -24,7 +46,7 @@ $PAGE->set_url($url);
 $strglossary   = get_string("modulename", "glossary");
 $strglossaries = get_string("modulenameplural", "glossary");
 $stredit       = get_string("edit");
-$entrydeleted  = get_string("entrydeleted","glossary");
+$entrydeleted  = get_string("entrydeleted", "glossary");
 
 
 if (! $cm = get_coursemodule_from_id('glossary', $id)) {
@@ -48,9 +70,9 @@ if (! $glossary = $DB->get_record("glossary", array("id"=>$cm->instance))) {
 }
 
 
-$strareyousuredelete = get_string("areyousuredelete","glossary");
+$strareyousuredelete = get_string("areyousuredelete", "glossary");
 
-if (($entry->userid != $USER->id) and !$manageentries) { // guest id is never matched, no need for special check here
+if (($entry->userid != $USER->id) and !$manageentries) { // Guest id is never matched, no need for special check here.
     print_error('nopermissiontodelentry');
 }
 $ineditperiod = ((time() - $entry->timecreated <  $CFG->maxeditingtime) || $glossary->editalways);
@@ -58,10 +80,10 @@ if (!$ineditperiod and !$manageentries) {
     print_error('errdeltimeexpired', 'glossary');
 }
 
-/// If data submitted, then process and store.
+// If data is submitted, then process and store.
 
-if ($confirm and confirm_sesskey()) { // the operation was confirmed.
-    // if it is an imported entry, just delete the relation
+if ($confirm and confirm_sesskey()) { // The operation was confirmed.
+    // If it is an imported entry, just delete the relation.
 
     if ($entry->sourceglossaryid) {
         if (!$newcm = get_coursemodule_from_instance('glossary', $entry->sourceglossaryid)) {
@@ -73,7 +95,7 @@ if ($confirm and confirm_sesskey()) { // the operation was confirmed.
         $entry->sourceglossaryid = 0;
         $DB->update_record('glossary_entries', $entry);
 
-        // move attachments too
+        // Move the attachments too.
         $fs = get_file_storage();
 
         if ($oldfiles = $fs->get_area_files($context->id, 'mod_glossary', 'attachment', $entry->id)) {
@@ -96,15 +118,15 @@ if ($confirm and confirm_sesskey()) { // the operation was confirmed.
         $DB->delete_records("glossary_alias", array("entryid"=>$entry->id));
         $DB->delete_records("glossary_entries", array("id"=>$entry->id));
 
-        // Update completion state
+        // Update completion state.
         $completion = new completion_info($course);
         if ($completion->is_enabled($cm) == COMPLETION_TRACKING_AUTOMATIC && $glossary->completionentries) {
             $completion->update_state($cm, COMPLETION_INCOMPLETE, $entry->userid);
         }
 
-        //delete glossary entry ratings
+        // Delete glossary entry ratings.
         require_once($CFG->dirroot.'/rating/lib.php');
-        $delopt = new stdClass;
+        $delopt = new stdClass();
         $delopt->contextid = $context->id;
         $delopt->component = 'mod_glossary';
         $delopt->ratingarea = 'entry';
@@ -113,10 +135,11 @@ if ($confirm and confirm_sesskey()) { // the operation was confirmed.
         $rm->delete_ratings($delopt);
     }
 
-    add_to_log($course->id, "glossary", "delete entry", "view.php?id=$cm->id&amp;mode=$prevmode&amp;hook=$hook", $entry->id,$cm->id);
+    add_to_log($course->id, "glossary", "delete entry", "view.php?id=$cm->id&amp;mode=$prevmode&amp;hook=$hook", $entry->id, $cm->id);
     redirect("view.php?id=$cm->id&amp;mode=$prevmode&amp;hook=$hook");
 
-} else {        // the operation has not been confirmed yet so ask the user to do so
+} else {
+    // The operation has not been confirmed yet so ask the user to do so.
     $PAGE->navbar->add(get_string('delete'));
     $PAGE->set_title(format_string($glossary->name));
     $PAGE->set_heading($course->fullname);

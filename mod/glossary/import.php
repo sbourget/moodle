@@ -1,11 +1,33 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * This file allows the import of glossaries
+ *
+ * @package    mod_glossary
+ * @copyright  2003 onwards Williams Castillo (castillow@tutopia.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once("../../config.php");
 require_once("lib.php");
 require_once("$CFG->dirroot/course/lib.php");
 require_once('import_form.php');
 
-$id = required_param('id', PARAM_INT);    // Course Module ID
+$id = required_param('id', PARAM_INT);    // Course Module ID.
 
 $mode     = optional_param('mode', 'letter', PARAM_ALPHA );
 $hook     = optional_param('hook', 'ALL', PARAM_ALPHANUM);
@@ -56,7 +78,7 @@ $form = new mod_glossary_import_form();
 
 if ( !$data = $form->get_data() ) {
     echo $OUTPUT->box_start('glossarydisplay generalbox');
-    // display upload form
+    // Display upload form.
     $data = new stdClass();
     $data->id = $id;
     $form->set_data($data);
@@ -83,7 +105,7 @@ if ($xml = glossary_read_imported_file($result)) {
     $rejections      = '';
 
     if ($data->dest == 'newglossary') {
-        // If the user chose to create a new glossary
+        // If the user chose to create a new glossary.
         $xmlglossary = $xml['GLOSSARY']['#']['INFO'][0]['#'];
 
         if ( $xmlglossary['NAME'][0]['#'] ) {
@@ -100,7 +122,7 @@ if ($xml = glossary_read_imported_file($result)) {
             $glossary->timemodified = time();
             $glossary->cmidnumber = $cm->idnumber;
 
-            // Setting the default values if no values were passed
+            // Setting the default values if no values were passed.
             if ( isset($xmlglossary['ENTBYPAGE'][0]['#']) ) {
                 $glossary->entbypage = ($xmlglossary['ENTBYPAGE'][0]['#']);
             } else {
@@ -132,19 +154,18 @@ if ($xml = glossary_read_imported_file($result)) {
                 $glossary->defaultapproval = $CFG->glossary_defaultapproval;
             }
 
-            // Include new glossary and return the new ID
+            // Include new glossary and return the new ID.
             if ( !$glossary->id = glossary_add_instance($glossary) ) {
                 echo $OUTPUT->notification("Error while trying to create the new glossary.");
                 glossary_print_tabbed_table_end();
                 echo $OUTPUT->footer();
                 exit;
             } else {
-                //The instance has been created, so lets do course_modules
-                //and course_sections
-                $mod->groupmode = $course->groupmode;  /// Default groupmode the same as course
+                // The instance has been created, so lets do course_modules and course_sections.
+                $mod->groupmode = $course->groupmode;  // Default groupmode the same as course.
 
                 $mod->instance = $glossary->id;
-                // course_modules and course_sections each contain a reference
+                // Course_modules and course_sections each contain a reference
                 // to each other, so we have to update one of them twice.
 
                 if (! $currmodule = $DB->get_record("modules", array("name"=>'glossary'))) {
@@ -160,7 +181,7 @@ if ($xml = glossary_read_imported_file($result)) {
                 }
 
                 $sectionid = course_add_cm_to_section($course, $mod->coursemodule, 0);
-                //We get the section's visible field status
+                // We get the section's visible field status.
                 $visible = $DB->get_field("course_sections", "visible", array("id"=>$sectionid));
 
                 $DB->set_field("course_modules", "visible", $visible, array("id"=>$mod->coursemodule));
@@ -174,7 +195,7 @@ if ($xml = glossary_read_imported_file($result)) {
 
                 rebuild_course_cache($course->id);
 
-                echo $OUTPUT->box(get_string("newglossarycreated","glossary"),'generalbox boxaligncenter boxwidthnormal');
+                echo $OUTPUT->box(get_string("newglossarycreated", "glossary"), 'generalbox boxaligncenter boxwidthnormal');
             }
         } else {
             echo $OUTPUT->notification("Error while trying to create the new glossary.");
@@ -184,9 +205,9 @@ if ($xml = glossary_read_imported_file($result)) {
     }
 
     $xmlentries = $xml['GLOSSARY']['#']['INFO'][0]['#']['ENTRIES'][0]['#']['ENTRY'];
-    $sizeofxmlentries = sizeof($xmlentries);
-    for($i = 0; $i < $sizeofxmlentries; $i++) {
-        // Inserting the entries
+    $sizeofxmlentries = count($xmlentries);
+    for ($i = 0; $i < $sizeofxmlentries; $i++) {
+        // Inserting the entries.
         $xmlentry = $xmlentries[$i];
         $newentry = new stdClass();
         $newentry->concept = trim($xmlentry['#']['CONCEPT'][0]['#']);
@@ -200,7 +221,7 @@ if ($xml = glossary_read_imported_file($result)) {
         $permissiongranted = 1;
         if ( $newentry->concept and $newentry->definition ) {
             if ( !$glossary->allowduplicatedentries ) {
-                // checking if the entry is valid (checking if it is duplicated when should not be)
+                // Checking if the entry is valid (checking if it is duplicated when should not be)...
                 if ( $newentry->casesensitive ) {
                     $dupentry = $DB->record_exists_select('glossary_entries',
                                     'glossaryid = :glossaryid AND concept = :concept', array(
@@ -229,7 +250,7 @@ if ($xml = glossary_read_imported_file($result)) {
             $newentry->timecreated      = time();
             $newentry->timemodified     = time();
 
-            // Setting the default values if no values were passed
+            // Setting the default values if no values were passed.
             if ( isset($xmlentry['#']['USEDYNALINK'][0]['#']) ) {
                 $newentry->usedynalink      = $xmlentry['#']['USEDYNALINK'][0]['#'];
             } else {
@@ -241,13 +262,13 @@ if ($xml = glossary_read_imported_file($result)) {
                 $newentry->fullmatch      = $CFG->glossary_fullmatch;
             }
 
-            $newentry->id = $DB->insert_record("glossary_entries",$newentry);
+            $newentry->id = $DB->insert_record("glossary_entries", $newentry);
             $importedentries++;
 
-            $xmlaliases = @$xmlentry['#']['ALIASES'][0]['#']['ALIAS']; // ignore missing ALIASES
-            $sizeofxmlaliases = sizeof($xmlaliases);
-            for($k = 0; $k < $sizeofxmlaliases; $k++) {
-            /// Importing aliases
+            $xmlaliases = @$xmlentry['#']['ALIASES'][0]['#']['ALIAS']; // Ignore missing ALIASES.
+            $sizeofxmlaliases = count($xmlaliases);
+            for ($k = 0; $k < $sizeofxmlaliases; $k++) {
+                // Importing aliases.
                 $xmlalias = $xmlaliases[$k];
                 $aliasname = $xmlalias['#']['NAME'][0]['#'];
 
@@ -255,56 +276,56 @@ if ($xml = glossary_read_imported_file($result)) {
                     $newalias = new stdClass();
                     $newalias->entryid = $newentry->id;
                     $newalias->alias = trim($aliasname);
-                    $newalias->id = $DB->insert_record("glossary_alias",$newalias);
+                    $newalias->id = $DB->insert_record("glossary_alias", $newalias);
                 }
             }
 
             if (!empty($data->catsincl)) {
                 // If the categories must be imported...
-                $xmlcats = @$xmlentry['#']['CATEGORIES'][0]['#']['CATEGORY']; // ignore missing CATEGORIES
-                $sizeofxmlcats = sizeof($xmlcats);
-                for($k = 0; $k < $sizeofxmlcats; $k++) {
+                $xmlcats = @$xmlentry['#']['CATEGORIES'][0]['#']['CATEGORY']; // Ignore missing CATEGORIES.
+                $sizeofxmlcats = count($xmlcats);
+                for ($k = 0; $k < $sizeofxmlcats; $k++) {
                     $xmlcat = $xmlcats[$k];
 
                     $newcat = new stdClass();
                     $newcat->name = $xmlcat['#']['NAME'][0]['#'];
                     $newcat->usedynalink = $xmlcat['#']['USEDYNALINK'][0]['#'];
-                    if ( !$category = $DB->get_record("glossary_categories", array("glossaryid"=>$glossary->id,"name"=>$newcat->name))) {
-                        // Create the category if it does not exist
+                    if ( !$category = $DB->get_record("glossary_categories", array("glossaryid"=>$glossary->id, "name"=>$newcat->name))) {
+                        // Create the category if it does not exist.
                         $category = new stdClass();
                         $category->name = $newcat->name;
                         $category->glossaryid = $glossary->id;
-                        $category->id = $DB->insert_record("glossary_categories",$category);
+                        $category->id = $DB->insert_record("glossary_categories", $category);
                         $importedcats++;
                     }
                     if ( $category ) {
-                        // inserting the new relation
+                        // Inserting the new relation.
                         $entrycat = new stdClass();
                         $entrycat->entryid    = $newentry->id;
                         $entrycat->categoryid = $category->id;
-                        $DB->insert_record("glossary_entries_categories",$entrycat);
+                        $DB->insert_record("glossary_entries_categories", $entrycat);
                     }
                 }
             }
         } else {
             $entriesrejected++;
             if ( $newentry->concept and $newentry->definition ) {
-                // add to exception report (duplicated entry))
+                // Add to exception report (duplicated entry).
                 $rejections .= "<tr><td>$newentry->concept</td>" .
-                               "<td>" . get_string("duplicateentry","glossary"). "</td></tr>";
+                               "<td>" . get_string("duplicateentry", "glossary"). "</td></tr>";
             } else {
-                // add to exception report (no concept or definition found))
+                // Add to exception report (no concept or definition found).
                 $rejections .= "<tr><td>---</td>" .
-                               "<td>" . get_string("noconceptfound","glossary"). "</td></tr>";
+                               "<td>" . get_string("noconceptfound", "glossary"). "</td></tr>";
             }
         }
     }
-    // processed entries
+    // Processed entries.
     echo $OUTPUT->box_start('glossarydisplay generalbox');
     echo '<table class="glossaryimportexport">';
     echo '<tr>';
     echo '<td width="50%" align="right">';
-    echo get_string("totalentries","glossary");
+    echo get_string("totalentries", "glossary");
     echo ':</td>';
     echo '<td width="50%" align="left">';
     echo $importedentries + $entriesrejected;
@@ -312,19 +333,19 @@ if ($xml = glossary_read_imported_file($result)) {
     echo '</tr>';
     echo '<tr>';
     echo '<td width="50%" align="right">';
-    echo get_string("importedentries","glossary");
+    echo get_string("importedentries", "glossary");
     echo ':</td>';
     echo '<td width="50%" align="left">';
     echo $importedentries;
     if ( $entriesrejected ) {
-        echo ' <small>(' . get_string("rejectedentries","glossary") . ": $entriesrejected)</small>";
+        echo ' <small>(' . get_string("rejectedentries", "glossary") . ": $entriesrejected)</small>";
     }
     echo '</td>';
     echo '</tr>';
     if (!empty($data->catsincl)) {
         echo '<tr>';
         echo '<td width="50%" align="right">';
-        echo get_string("importedcategories","glossary");
+        echo get_string("importedcategories", "glossary");
         echo ':</td>';
         echo '<td width="50%">';
         echo $importedcats;
@@ -333,14 +354,14 @@ if ($xml = glossary_read_imported_file($result)) {
     }
     echo '</table><hr />';
 
-    // rejected entries
+    // Rejected entries.
     if ($rejections) {
-        echo $OUTPUT->heading(get_string("rejectionrpt","glossary"), 4);
+        echo $OUTPUT->heading(get_string("rejectionrpt", "glossary"), 4);
         echo '<table class="glossaryimportexport">';
         echo $rejections;
         echo '</table><hr />';
     }
-/// Print continue button, based on results
+    // Print continue button, based on results.
     if ($importedentries) {
         echo $OUTPUT->continue_button('view.php?id='.$id);
     } else {
@@ -354,5 +375,5 @@ if ($xml = glossary_read_imported_file($result)) {
     echo $OUTPUT->box_end();
 }
 
-/// Finish the page
+// Finish the page.
 echo $OUTPUT->footer();

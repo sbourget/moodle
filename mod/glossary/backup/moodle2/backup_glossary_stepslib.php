@@ -33,10 +33,10 @@ class backup_glossary_activity_structure_step extends backup_activity_structure_
 
     protected function define_structure() {
 
-        // To know if we are including userinfo
+        // To know if we are including userinfo.
         $userinfo = $this->get_setting_value('userinfo');
 
-        // Define each element separated
+        // Define each element separated.
         $glossary = new backup_nested_element('glossary', array('id'), array(
             'name', 'intro', 'introformat', 'allowduplicatedentries', 'displayformat',
             'mainglossary', 'showspecial', 'showalphabet', 'showall',
@@ -73,7 +73,7 @@ class backup_glossary_activity_structure_step extends backup_activity_structure_
         $categoryentry = new backup_nested_element('category_entry', array('id'), array(
             'entryid'));
 
-        // Build the tree
+        // Build the tree.
         $glossary->add_child($entries);
         $entries->add_child($entry);
 
@@ -89,12 +89,12 @@ class backup_glossary_activity_structure_step extends backup_activity_structure_
         $category->add_child($categoryentries);
         $categoryentries->add_child($categoryentry);
 
-        // Define sources
+        // Define sources.
         $glossary->set_source_table('glossary', array('id' => backup::VAR_ACTIVITYID));
 
         $category->set_source_table('glossary_categories', array('glossaryid' => backup::VAR_PARENTID));
 
-        // All the rest of elements only happen if we are including user info
+        // All the rest of elements only happen if we are including user info.
         if ($userinfo) {
             $entry->set_source_table('glossary_entries', array('glossaryid' => backup::VAR_PARENTID));
 
@@ -110,7 +110,7 @@ class backup_glossary_activity_structure_step extends backup_activity_structure_
             $categoryentry->set_source_table('glossary_entries_categories', array('categoryid' => backup::VAR_PARENTID));
         }
 
-        // Define id annotations
+        // Define id annotations.
         $glossary->annotate_ids('scale', 'scale');
 
         $entry->annotate_ids('user', 'userid');
@@ -119,13 +119,13 @@ class backup_glossary_activity_structure_step extends backup_activity_structure_
 
         $rating->annotate_ids('user', 'userid');
 
-        // Define file annotations
-        $glossary->annotate_files('mod_glossary', 'intro', null); // This file area hasn't itemid
+        // Define file annotations.
+        $glossary->annotate_files('mod_glossary', 'intro', null); // This file area hasn't itemid.
 
         $entry->annotate_files('mod_glossary', 'entry', 'id');
         $entry->annotate_files('mod_glossary', 'attachment', 'id');
 
-        // Return the root element (glossary), wrapped into standard activity structure
+        // Return the root element (glossary), wrapped into standard activity structure.
         return $this->prepare_activity_structure($glossary);
     }
 }

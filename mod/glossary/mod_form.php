@@ -1,9 +1,32 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Glossary module add form
+ *
+ * @package    mod_glossary
+ * @copyright  2006 onwards Jamie Pratt
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+    die('Direct access to this script is forbidden.');    //  It must be included from a Moodle page.
 }
 
-require_once ($CFG->dirroot.'/course/moodleform_mod.php');
+require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
 class mod_glossary_mod_form extends moodleform_mod {
 
@@ -12,7 +35,7 @@ class mod_glossary_mod_form extends moodleform_mod {
 
         $mform    =& $this->_form;
 
-//-------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         $mform->addElement('text', 'name', get_string('name'), array('size'=>'64'));
@@ -34,7 +57,7 @@ class mod_glossary_mod_form extends moodleform_mod {
             $mform->addElement('checkbox', 'globalglossary', get_string('isglobal', 'glossary'));
             $mform->addHelpButton('globalglossary', 'isglobal', 'glossary');
 
-        }else{
+        } else {
             $mform->addElement('hidden', 'globalglossary');
             $mform->setType('globalglossary', PARAM_INT);
         }
@@ -64,16 +87,16 @@ class mod_glossary_mod_form extends moodleform_mod {
         $mform->setDefault('defaultapproval', $CFG->glossary_defaultapproval);
         $mform->addHelpButton('defaultapproval', 'defaultapproval', 'glossary');
 
-        //get and update available formats
+        // Get and update available formats.
         $recformats = glossary_get_available_formats();
 
         $formats = array();
 
-        //Take names
+        // Take names.
         foreach ($recformats as $format) {
-           $formats[$format->name] = get_string('displayformat'.$format->name, 'glossary');
+            $formats[$format->name] = get_string('displayformat'.$format->name, 'glossary');
         }
-        //Sort it
+        // Sort it.
         asort($formats);
         $mform->addElement('select', 'displayformat', get_string('displayformat', 'glossary'), $formats);
         $mform->setDefault('displayformat', 'dictionary');
@@ -102,7 +125,7 @@ class mod_glossary_mod_form extends moodleform_mod {
         $mform->addHelpButton('editalways', 'editalways', 'glossary');
 
         if ($CFG->enablerssfeeds && isset($CFG->glossary_enablerssfeeds) && $CFG->glossary_enablerssfeeds) {
-//-------------------------------------------------------------------------------
+            // -------------------------------------------------------------------------------
             $mform->addElement('header', '', get_string('rss'));
             $choices = array();
             $choices[0] = get_string('none');
@@ -130,14 +153,14 @@ class mod_glossary_mod_form extends moodleform_mod {
             $mform->disabledIf('rssarticles', 'rsstype', 'eq', 0);
         }
 
-//-------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------
 
         $this->standard_grading_coursemodule_elements();
 
         $this->standard_coursemodule_elements();
 
-//-------------------------------------------------------------------------------
-        // buttons
+        // -------------------------------------------------------------------------------
+        // Buttons.
         $this->add_action_buttons();
     }
 
@@ -148,8 +171,8 @@ class mod_glossary_mod_form extends moodleform_mod {
         $mform    =& $this->_form;
         $mainglossaryel =& $mform->getElement('mainglossary');
         $mainglossary = $DB->get_record('glossary', array('mainglossary'=>1, 'course'=>$COURSE->id));
-        if ($mainglossary && ($mainglossary->id != $mform->getElementValue('instance'))){
-            //secondary glossary, a main one already exists in this course.
+        if ($mainglossary && ($mainglossary->id != $mform->getElementValue('instance'))) {
+            // Secondary glossary, a main one already exists in this course.
             $mainglossaryel->setValue(0);
             $mainglossaryel->freeze();
             $mainglossaryel->setPersistantFreeze(true);
@@ -160,7 +183,7 @@ class mod_glossary_mod_form extends moodleform_mod {
         }
     }
 
-    function data_preprocessing(&$default_values){
+    function data_preprocessing(&$default_values) {
         parent::data_preprocessing($default_values);
 
         // Set up the completion checkboxes which aren't part of standard data.
@@ -177,11 +200,11 @@ class mod_glossary_mod_form extends moodleform_mod {
         $mform =& $this->_form;
 
         $group=array();
-        $group[] =& $mform->createElement('checkbox', 'completionentriesenabled', '', get_string('completionentries','glossary'));
+        $group[] =& $mform->createElement('checkbox', 'completionentriesenabled', '', get_string('completionentries', 'glossary'));
         $group[] =& $mform->createElement('text', 'completionentries', '', array('size'=>3));
         $mform->setType('completionentries', PARAM_INT);
-        $mform->addGroup($group, 'completionentriesgroup', get_string('completionentriesgroup','glossary'), array(' '), false);
-        $mform->disabledIf('completionentries','completionentriesenabled','notchecked');
+        $mform->addGroup($group, 'completionentriesgroup', get_string('completionentriesgroup', 'glossary'), array(' '), false);
+        $mform->disabledIf('completionentries', 'completionentriesenabled', 'notchecked');
 
         return array('completionentriesgroup');
     }
@@ -195,7 +218,7 @@ class mod_glossary_mod_form extends moodleform_mod {
         if (!$data) {
             return false;
         }
-        // Turn off completion settings if the checkboxes aren't ticked
+        // Turn off completion settings if the checkboxes aren't ticked.
         $autocompletion = !empty($data->completion) && $data->completion==COMPLETION_TRACKING_AUTOMATIC;
         if (empty($data->completionentriesenabled) || !$autocompletion) {
             $data->completionentries = 0;
@@ -204,4 +227,3 @@ class mod_glossary_mod_form extends moodleform_mod {
     }
 
 }
-

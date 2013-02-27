@@ -1,13 +1,36 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * This page is used to export a glossary
+ *
+ * @package    mod_glossary
+ * @copyright  2003 onwards Williams Castillo (castillow@tutopia.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 
 require_once("../../config.php");
 require_once("lib.php");
 
-$id = required_param('id', PARAM_INT);      // Course Module ID
+$id = required_param('id', PARAM_INT);      // Course Module ID.
 
-$mode= optional_param('mode', '', PARAM_ALPHA);           // term entry cat date letter search author approval
-$hook= optional_param('hook', '', PARAM_CLEAN);           // the term, entry, cat, etc... to look for based on mode
-$cat = optional_param('cat',0, PARAM_ALPHANUM);
+$mode= optional_param('mode', '', PARAM_ALPHA);           // Term entry cat date letter search author approval.
+$hook= optional_param('hook', '', PARAM_CLEAN);           // The term, entry, cat, etc... to look for based on mode.
+$cat = optional_param('cat', 0, PARAM_ALPHANUM);
 
 $url = new moodle_url('/mod/glossary/export.php', array('id'=>$id));
 if ($cat !== 0) {
@@ -66,13 +89,12 @@ $exporturl = moodle_url::make_pluginfile_url($context->id, 'mod_glossary', 'expo
     </div>
     </form>
 <?php
-    // don't need cap check here, we share with the general export.
-    if (!empty($CFG->enableportfolios) && $DB->count_records('glossary_entries', array('glossaryid' => $glossary->id))) {
-        require_once($CFG->libdir . '/portfoliolib.php');
-        $button = new portfolio_add_button();
-        $button->set_callback_options('glossary_full_portfolio_caller', array('id' => $cm->id), 'mod_glossary');
-        $button->render();
-    }
-    echo $OUTPUT->box_end();
-    echo $OUTPUT->footer();
-?>
+// Don't need cap check here, we share with the general export.
+if (!empty($CFG->enableportfolios) && $DB->count_records('glossary_entries', array('glossaryid' => $glossary->id))) {
+    require_once($CFG->libdir . '/portfoliolib.php');
+    $button = new portfolio_add_button();
+    $button->set_callback_options('glossary_full_portfolio_caller', array('id' => $cm->id), 'mod_glossary');
+    $button->render();
+}
+echo $OUTPUT->box_end();
+echo $OUTPUT->footer();

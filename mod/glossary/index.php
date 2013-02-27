@@ -1,14 +1,33 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/// This page lists all the instances of glossary in a particular course
-/// Replace glossary with the name of your module
+/**
+ * This page lists all the instances of glossary in a particular course
+ *
+ * @package    mod_glossary
+ * @copyright  2003 onwards Williams Castillo (castillow@tutopia.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once("../../config.php");
 require_once("lib.php");
 require_once("$CFG->libdir/rsslib.php");
 require_once("$CFG->dirroot/course/lib.php");
 
-$id = required_param('id', PARAM_INT);   // course
+$id = required_param('id', PARAM_INT);   // Course.
 
 $PAGE->set_url('/mod/glossary/index.php', array('id'=>$id));
 
@@ -23,20 +42,20 @@ $context = context_course::instance($course->id);
 add_to_log($course->id, "glossary", "view all", "index.php?id=$course->id", "");
 
 
-/// Get all required strings
+// Get all required strings.
 
 $strglossarys = get_string("modulenameplural", "glossary");
 $strglossary  = get_string("modulename", "glossary");
 $strrss = get_string("rss");
 
 
-/// Print the header
+// Print the header.
 $PAGE->navbar->add($strglossarys, "index.php?id=$course->id");
 $PAGE->set_title($strglossarys);
 $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 
-/// Get all the appropriate data
+// Get all the appropriate data.
 
 if (! $glossarys = get_all_instances_in_course("glossary", $course)) {
     notice(get_string('thereareno', 'moodle', $strglossarys), "../../course/view.php?id=$course->id");
@@ -45,7 +64,7 @@ if (! $glossarys = get_all_instances_in_course("glossary", $course)) {
 
 $usesections = course_format_uses_sections($course->format);
 
-/// Print the list of instances (your module will probably extend this)
+// Print the list of instances (your module will probably extend this).
 
 $timenow = time();
 $strsectionname  = get_string('sectionname', 'format_'.$course->format);
@@ -73,10 +92,10 @@ $currentsection = "";
 foreach ($glossarys as $glossary) {
     if (!$glossary->visible && has_capability('moodle/course:viewhiddenactivities', $context)) {
         // Show dimmed if the mod is hidden.
-        $link = "<a class=\"dimmed\" href=\"view.php?id=$glossary->coursemodule\">".format_string($glossary->name,true)."</a>";
+        $link = "<a class=\"dimmed\" href=\"view.php?id=$glossary->coursemodule\">".format_string($glossary->name, true)."</a>";
     } else if ($glossary->visible) {
         // Show normal if the mod is visible.
-        $link = "<a href=\"view.php?id=$glossary->coursemodule\">".format_string($glossary->name,true)."</a>";
+        $link = "<a href=\"view.php?id=$glossary->coursemodule\">".format_string($glossary->name, true)."</a>";
     } else {
         // Don't show the glossary.
         continue;
@@ -94,22 +113,26 @@ foreach ($glossarys as $glossary) {
         }
     }
 
-    // TODO: count only approved if not allowed to see them
+    // TODO: count only approved if not allowed to see them.
 
-    $count = $DB->count_records_sql("SELECT COUNT(*) FROM {glossary_entries} WHERE (glossaryid = ? OR sourceglossaryid = ?)", array($glossary->id, $glossary->id));
+    $count = $DB->count_records_sql("SELECT COUNT(*)
+                                       FROM {glossary_entries}
+                                      WHERE (glossaryid = ?
+                                         OR sourceglossaryid = ?)",
+                                     array($glossary->id, $glossary->id));
 
-    //If this glossary has RSS activated, calculate it
+    // If this glossary has RSS activated, calculate it.
     if ($show_rss) {
         $rsslink = '';
         if ($glossary->rsstype and $glossary->rssarticles) {
-            //Calculate the tolltip text
-            $tooltiptext = get_string("rsssubscriberss","glossary",format_string($glossary->name));
+            // Calculate the tolltip text.
+            $tooltiptext = get_string("rsssubscriberss", "glossary", format_string($glossary->name));
             if (!isloggedin()) {
                 $userid = 0;
             } else {
                 $userid = $USER->id;
             }
-            //Get html code for RSS link
+            // Get html code for RSS link.
             $rsslink = rss_get_link($context->id, $userid, 'mod_glossary', $glossary->id, $tooltiptext);
         }
     }
@@ -131,7 +154,7 @@ echo "<br />";
 
 echo html_writer::table($table);
 
-/// Finish the page
+// Finish the page.
 
 echo $OUTPUT->footer();
 

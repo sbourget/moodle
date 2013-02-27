@@ -1,25 +1,46 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/// This page prints a particular instance of glossary
+/**
+ * This page prints a particular instance of glossary
+ *
+ * @package    mod_glossary
+ * @copyright  2003 onwards Williams Castillo (castillow@tutopia.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 require_once("../../config.php");
 require_once("lib.php");
 require_once($CFG->libdir . '/completionlib.php');
 require_once("$CFG->libdir/rsslib.php");
 
-$id = optional_param('id', 0, PARAM_INT);           // Course Module ID
-$g  = optional_param('g', 0, PARAM_INT);            // Glossary ID
+$id = optional_param('id', 0, PARAM_INT);           // Course Module ID.
+$g  = optional_param('g', 0, PARAM_INT);            // Glossary ID.
 
-$tab  = optional_param('tab', GLOSSARY_NO_VIEW, PARAM_ALPHA);    // browsing entries by categories?
-$displayformat = optional_param('displayformat',-1, PARAM_INT);  // override of the glossary display format
+$tab  = optional_param('tab', GLOSSARY_NO_VIEW, PARAM_ALPHA);    // Browsing entries by categories?
+$displayformat = optional_param('displayformat', -1, PARAM_INT);  // Override of the glossary display format.
 
-$mode       = optional_param('mode', '', PARAM_ALPHA);           // term entry cat date letter search author approval
-$hook       = optional_param('hook', '', PARAM_CLEAN);           // the term, entry, cat, etc... to look for based on mode
-$fullsearch = optional_param('fullsearch', 0,PARAM_INT);         // full search (concept and definition) when searching?
-$sortkey    = optional_param('sortkey', '', PARAM_ALPHA);// Sorted view: CREATION | UPDATE | FIRSTNAME | LASTNAME...
-$sortorder  = optional_param('sortorder', 'ASC', PARAM_ALPHA);   // it defines the order of the sorting (ASC or DESC)
-$offset     = optional_param('offset', 0,PARAM_INT);             // entries to bypass (for paging purposes)
-$page       = optional_param('page', 0,PARAM_INT);               // Page to show (for paging purposes)
-$show       = optional_param('show', '', PARAM_ALPHA);           // [ concept | alias ] => mode=term hook=$show
+$mode       = optional_param('mode', '', PARAM_ALPHA);           // Term entry cat date letter search author approval.
+$hook       = optional_param('hook', '', PARAM_CLEAN);           // The term, entry, cat, etc... to look for based on mode.
+$fullsearch = optional_param('fullsearch', 0, PARAM_INT);         // Full search (concept and definition) when searching?
+$sortkey    = optional_param('sortkey', '', PARAM_ALPHA);        // Sorted view: CREATION | UPDATE | FIRSTNAME | LASTNAME...
+$sortorder  = optional_param('sortorder', 'ASC', PARAM_ALPHA);   // It defines the order of the sorting (ASC or DESC).
+$offset     = optional_param('offset', 0, PARAM_INT);             // Entries to bypass (for paging purposes).
+$page       = optional_param('page', 0, PARAM_INT);               // Page to show (for paging purposes).
+$show       = optional_param('show', '', PARAM_ALPHA);           // [ concept | alias ] => mode=term hook=$show.
 
 if (!empty($id)) {
     if (! $cm = get_coursemodule_from_id('glossary', $id)) {
@@ -51,32 +72,32 @@ require_course_login($course->id, true, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/glossary:view', $context);
 
-// Prepare format_string/text options
+// Prepare format_string/text options.
 $fmtoptions = array(
     'context' => $context);
 
 require_once($CFG->dirroot . '/comment/lib.php');
 comment::init();
 
-/// redirecting if adding a new entry
+// Redirecting if adding a new entry.
 if ($tab == GLOSSARY_ADDENTRY_VIEW ) {
     redirect("edit.php?cmid=$cm->id&amp;mode=$mode");
 }
 
-/// setting the defaut number of entries per page if not set
+// Setting the defaut number of entries per page if not set.
 if ( !$entriesbypage = $glossary->entbypage ) {
     $entriesbypage = $CFG->glossary_entbypage;
 }
 
-/// If we have received a page, recalculate offset
+// If we have received a page, recalculate offset.
 if ($page != 0 && $offset == 0) {
     $offset = $page * $entriesbypage;
 }
 
-/// setting the default values for the display mode of the current glossary
-/// only if the glossary is viewed by the first time
+// Setting the default values for the display mode of the current glossary
+// only if the glossary is viewed by the first time.
 if ( $dp = $DB->get_record('glossary_formats', array('name'=>$glossary->displayformat)) ) {
-/// Based on format->defaultmode, we build the defaulttab to be showed sometimes
+    // Based on format->defaultmode, we build the defaulttab to be showed sometimes.
     switch ($dp->defaultmode) {
         case 'cat':
             $defaulttab = GLOSSARY_CATEGORY_VIEW;
@@ -90,7 +111,7 @@ if ( $dp = $DB->get_record('glossary_formats', array('name'=>$glossary->displayf
         default:
             $defaulttab = GLOSSARY_STANDARD_VIEW;
     }
-/// Fetch the rest of variables
+    // Fetch the rest of variables.
     $printpivot = $dp->showgroup;
     if ( $mode == '' and $hook == '' and $show == '') {
         $mode      = $dp->defaultmode;
@@ -116,7 +137,7 @@ if ( $show ) {
     $hook = $show;
     $show = '';
 }
-/// Processing standard security processes
+// Processing standard security processes.
 if ($course->id != SITEID) {
     require_login($course);
 }
@@ -126,11 +147,11 @@ if (!$cm->visible and !has_capability('moodle/course:viewhiddenactivities', $con
 }
 add_to_log($course->id, "glossary", "view", "view.php?id=$cm->id&amp;tab=$tab", $glossary->id, $cm->id);
 
-// Mark as viewed
+// Mark as viewed.
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
-/// stablishing flag variables
+// Establishing flag variables.
 if ( $sortorder = strtolower($sortorder) ) {
     if ($sortorder != 'asc' and $sortorder != 'desc') {
         $sortorder = '';
@@ -147,89 +168,89 @@ if ( $sortkey = strtoupper($sortkey) ) {
 }
 
 switch ( $mode = strtolower($mode) ) {
-case 'search': /// looking for terms containing certain word(s)
-    $tab = GLOSSARY_STANDARD_VIEW;
+    case 'search': // Looking for terms containing certain word(s).
+        $tab = GLOSSARY_STANDARD_VIEW;
 
-    //Clean a bit the search string
-    $hook = trim(strip_tags($hook));
+        // Clean a bit the search string.
+        $hook = trim(strip_tags($hook));
 
-break;
+    break;
 
-case 'entry':  /// Looking for a certain entry id
-    $tab = GLOSSARY_STANDARD_VIEW;
-    if ( $dp = $DB->get_record("glossary_formats", array("name"=>$glossary->displayformat)) ) {
-        $displayformat = $dp->popupformatname;
-    }
-break;
+    case 'entry':  // Looking for a certain entry id.
+        $tab = GLOSSARY_STANDARD_VIEW;
+        if ( $dp = $DB->get_record("glossary_formats", array("name"=>$glossary->displayformat)) ) {
+            $displayformat = $dp->popupformatname;
+        }
+    break;
 
-case 'cat':    /// Looking for a certain cat
-    $tab = GLOSSARY_CATEGORY_VIEW;
-    if ( $hook > 0 ) {
-        $category = $DB->get_record("glossary_categories", array("id"=>$hook));
-    }
-break;
+    case 'cat':    // Looking for a certain cat.
+        $tab = GLOSSARY_CATEGORY_VIEW;
+        if ( $hook > 0 ) {
+            $category = $DB->get_record("glossary_categories", array("id"=>$hook));
+        }
+    break;
 
-case 'approval':    /// Looking for entries waiting for approval
-    $tab = GLOSSARY_APPROVAL_VIEW;
-    // Override the display format with the approvaldisplayformat
-    if ($glossary->approvaldisplayformat !== 'default' && ($df = $DB->get_record("glossary_formats",
-            array("name" => $glossary->approvaldisplayformat)))) {
-        $displayformat = $df->popupformatname;
-    }
-    if ( !$hook and !$sortkey and !$sortorder) {
-        $hook = 'ALL';
-    }
-break;
+    case 'approval':    // Looking for entries waiting for approval.
+        $tab = GLOSSARY_APPROVAL_VIEW;
+        // Override the display format with the approvaldisplayformat.
+        if ($glossary->approvaldisplayformat !== 'default' && ($df = $DB->get_record("glossary_formats",
+                array("name" => $glossary->approvaldisplayformat)))) {
+            $displayformat = $df->popupformatname;
+        }
+        if ( !$hook and !$sortkey and !$sortorder) {
+            $hook = 'ALL';
+        }
+    break;
 
-case 'term':   /// Looking for entries that include certain term in its concept, definition or aliases
-    $tab = GLOSSARY_STANDARD_VIEW;
-break;
+    case 'term':   // Looking for entries that include certain term in its concept, definition or aliases.
+        $tab = GLOSSARY_STANDARD_VIEW;
+    break;
 
-case 'date':
-    $tab = GLOSSARY_DATE_VIEW;
-    if ( !$sortkey ) {
-        $sortkey = 'UPDATE';
-    }
-    if ( !$sortorder ) {
-        $sortorder = 'desc';
-    }
-break;
+    case 'date':
+        $tab = GLOSSARY_DATE_VIEW;
+        if ( !$sortkey ) {
+            $sortkey = 'UPDATE';
+        }
+        if ( !$sortorder ) {
+            $sortorder = 'desc';
+        }
+    break;
 
-case 'author':  /// Looking for entries, browsed by author
-    $tab = GLOSSARY_AUTHOR_VIEW;
-    if ( !$hook ) {
-        $hook = 'ALL';
-    }
-    if ( !$sortkey ) {
-        $sortkey = 'FIRSTNAME';
-    }
-    if ( !$sortorder ) {
-        $sortorder = 'asc';
-    }
-break;
+    case 'author':  // Looking for entries, browsed by author.
+        $tab = GLOSSARY_AUTHOR_VIEW;
+        if ( !$hook ) {
+            $hook = 'ALL';
+        }
+        if ( !$sortkey ) {
+            $sortkey = 'FIRSTNAME';
+        }
+        if ( !$sortorder ) {
+            $sortorder = 'asc';
+        }
+    break;
 
-case 'letter':  /// Looking for entries that begin with a certain letter, ALL or SPECIAL characters
-default:
-    $tab = GLOSSARY_STANDARD_VIEW;
-    if ( !$hook ) {
-        $hook = 'ALL';
-    }
-break;
+    case 'letter':  // Looking for entries that begin with a certain letter, ALL or SPECIAL characters.
+    default:
+        $tab = GLOSSARY_STANDARD_VIEW;
+        if ( !$hook ) {
+            $hook = 'ALL';
+        }
+    break;
 }
 
 switch ( $tab ) {
-case GLOSSARY_IMPORT_VIEW:
-case GLOSSARY_EXPORT_VIEW:
-case GLOSSARY_APPROVAL_VIEW:
-    $showcommonelements = 0;
-break;
+    case GLOSSARY_IMPORT_VIEW:
+    case GLOSSARY_EXPORT_VIEW:
+    case GLOSSARY_APPROVAL_VIEW:
+        $showcommonelements = 0;
+    break;
 
-default:
-    $showcommonelements = 1;
-break;
+    default:
+        $showcommonelements = 1;
+    break;
 }
 
-/// Printing the heading
+// Printing the heading.
 $strglossaries = get_string("modulenameplural", "glossary");
 $strglossary = get_string("modulename", "glossary");
 $strallcategories = get_string("allcategories", "glossary");
@@ -239,7 +260,7 @@ $strsearchindefinition = get_string("searchindefinition", "glossary");
 $strsearch = get_string("search");
 $strwaitingapproval = get_string('waitingapproval', 'glossary');
 
-/// If we are in approval mode, prit special header
+// If we are in approval mode, print special header.
 $PAGE->set_title(format_string($glossary->name));
 $PAGE->set_heading($course->fullname);
 $url = new moodle_url('/mod/glossary/view.php', array('id'=>$cm->id));
@@ -260,16 +281,16 @@ if ($tab == GLOSSARY_APPROVAL_VIEW) {
     $PAGE->navbar->add($strwaitingapproval);
     echo $OUTPUT->header();
     echo $OUTPUT->heading($strwaitingapproval);
-} else { /// Print standard header
+} else { // Print standard header.
     echo $OUTPUT->header();
 }
 
-/// All this depends if whe have $showcommonelements
+// All this depends if whe have $showcommonelements.
 if ($showcommonelements) {
-/// To calculate available options
+    // To calculate available options.
     $availableoptions = '';
 
-/// Decide about to print the import link
+    // Decide about to print the import link.
     /*if (has_capability('mod/glossary:import', $context)) {
         $availableoptions = '<span class="helplink">' .
                             '<a href="' . $CFG->wwwroot . '/mod/glossary/import.php?id=' . $cm->id . '"' .
@@ -277,7 +298,7 @@ if ($showcommonelements) {
                             get_string('importentries', 'glossary') . '</a>' .
                             '</span>';
     }
-/// Decide about to print the export link
+    // Decide about to print the export link.
     if (has_capability('mod/glossary:export', $context)) {
         if ($availableoptions) {
             $availableoptions .= '&nbsp;/&nbsp;';
@@ -290,9 +311,9 @@ if ($showcommonelements) {
                             '</span>';
     }*/
 
-/// Decide about to print the approval link
+    // Decide about to print the approval link.
     if (has_capability('mod/glossary:approve', $context)) {
-    /// Check we have pending entries
+        // Check we have pending entries.
         if ($hiddenentries = $DB->count_records('glossary_entries', array('glossaryid'=>$glossary->id, 'approved'=>0))) {
             if ($availableoptions) {
                 $availableoptions .= '<br />';
@@ -306,34 +327,32 @@ if ($showcommonelements) {
         }
     }
 
-/// Start to print glossary controls
-//        print_box_start('glossarycontrol clearfix');
+    // Start to print glossary controls.
     echo '<div class="glossarycontrol" style="text-align: right">';
     echo $availableoptions;
 
-/// The print icon
+    // The print icon.
     if ( $showcommonelements and $mode != 'search') {
         if (has_capability('mod/glossary:manageentries', $context) or $glossary->allowprintview) {
-//                print_box_start('printicon');
             echo '<span class="wrap printicon">';
-            echo " <a title =\"". get_string("printerfriendly","glossary") ."\" href=\"print.php?id=$cm->id&amp;mode=$mode&amp;hook=".urlencode($hook)."&amp;sortkey=$sortkey&amp;sortorder=$sortorder&amp;offset=$offset\"><img class=\"icon\" src=\"".$OUTPUT->pix_url('print', 'glossary')."\" alt=\"". get_string("printerfriendly","glossary") . "\" /></a>";
+            echo " <a title =\"". get_string("printerfriendly", "glossary")
+                   ."\" href=\"print.php?id=$cm->id&amp;mode=$mode&amp;hook=".urlencode($hook)
+                   ."&amp;sortkey=$sortkey&amp;sortorder=$sortorder&amp;offset=$offset\"><img class=\"icon\" src=\""
+                   .$OUTPUT->pix_url('print', 'glossary')."\" alt=\"". get_string("printerfriendly", "glossary") . "\" /></a>";
             echo '</span>';
-//                print_box_end();
         }
     }
-/// End glossary controls
-//        print_box_end(); /// glossarycontrol
+    // End glossary controls.
     echo '</div>';
 
-//        print_box('&nbsp;', 'clearer');
 }
 
-/// Info box
+// Info box.
 if ($glossary->intro && $showcommonelements) {
     echo $OUTPUT->box(format_module_intro('glossary', $glossary, $cm->id), 'generalbox', 'intro');
 }
 
-/// Search box
+// Search box.
 if ($showcommonelements ) {
     echo '<form method="post" action="view.php">';
 
@@ -362,7 +381,7 @@ if ($showcommonelements ) {
     echo '<br />';
 }
 
-/// Show the add entry button if allowed
+// Show the add entry button if allowed.
 if (has_capability('mod/glossary:write', $context) && $showcommonelements ) {
     echo '<div class="singlebutton glossaryaddentry">';
     echo "<form id=\"newentryform\" method=\"get\" action=\"$CFG->wwwroot/mod/glossary/edit.php\">";
@@ -380,35 +399,37 @@ require("tabs.php");
 
 require("sql.php");
 
-/// printing the entries
+// Printing the entries.
 $entriesshown = 0;
 $currentpivot = '';
-$paging = NULL;
+$paging = null;
 
 if ($allentries) {
 
-    //Decide if we must show the ALL link in the pagebar
+    // Decide if we must show the ALL link in the pagebar.
     $specialtext = '';
     if ($glossary->showall) {
-        $specialtext = get_string("allentries","glossary");
+        $specialtext = get_string("allentries", "glossary");
     }
 
-    //Build paging bar
-    $paging = glossary_get_paging_bar($count, $page, $entriesbypage, "view.php?id=$id&amp;mode=$mode&amp;hook=".urlencode($hook)."&amp;sortkey=$sortkey&amp;sortorder=$sortorder&amp;fullsearch=$fullsearch&amp;",9999,10,'&nbsp;&nbsp;', $specialtext, -1);
+    // Build paging bar.
+    $paging = glossary_get_paging_bar($count, $page, $entriesbypage, "view.php?id=$id&amp;mode=$mode&amp;hook="
+              .urlencode($hook)."&amp;sortkey=$sortkey&amp;sortorder=$sortorder&amp;fullsearch=$fullsearch&amp;",
+              9999, 10, '&nbsp;&nbsp;', $specialtext, -1);
 
     echo '<div class="paging">';
     echo $paging;
     echo '</div>';
 
-    //load ratings
+    // Load ratings.
     require_once($CFG->dirroot.'/rating/lib.php');
     if ($glossary->assessed != RATING_AGGREGATE_NONE) {
-        $ratingoptions = new stdClass;
+        $ratingoptions = new stdClass();
         $ratingoptions->context = $context;
         $ratingoptions->component = 'mod_glossary';
         $ratingoptions->ratingarea = 'entry';
         $ratingoptions->items = $allentries;
-        $ratingoptions->aggregate = $glossary->assessed;//the aggregation method
+        $ratingoptions->aggregate = $glossary->assessed; // The aggregation method.
         $ratingoptions->scaleid = $glossary->scale;
         $ratingoptions->userid = $USER->id;
         $ratingoptions->returnurl = $CFG->wwwroot.'/mod/glossary/view.php?id='.$cm->id;
@@ -421,21 +442,21 @@ if ($allentries) {
 
     foreach ($allentries as $entry) {
 
-        // Setting the pivot for the current entry
+        // Setting the pivot for the current entry.
         $pivot = $entry->glossarypivot;
         $upperpivot = textlib::strtoupper($pivot);
         $pivottoshow = textlib::strtoupper(format_string($pivot, true, $fmtoptions));
-        // Reduce pivot to 1cc if necessary
+        // Reduce pivot to 1cc if necessary.
         if ( !$fullpivot ) {
             $upperpivot = textlib::substr($upperpivot, 0, 1);
             $pivottoshow = textlib::substr($pivottoshow, 0, 1);
         }
 
-        // if there's a group break
+        // If there's a group break.
         if ( $currentpivot != $upperpivot ) {
 
-            // print the group break if apply
-            if ( $printpivot )  {
+            // Print the group break if apply.
+            if ( $printpivot ) {
                 $currentpivot = $upperpivot;
 
                 echo '<div>';
@@ -443,7 +464,7 @@ if ($allentries) {
 
                 echo '<tr>';
                 if ( isset($entry->userispivot) ) {
-                // printing the user icon if defined (only when browsing authors)
+                    // Printing the user icon if defined (only when browsing authors).
                     echo '<th align="left">';
 
                     $user = $DB->get_record("user", array("id"=>$entry->userid));
@@ -459,37 +480,37 @@ if ($allentries) {
             }
         }
 
-        /// highlight the term if necessary
+        // Highlight the term if necessary.
         if ($mode == 'search') {
-            //We have to strip any word starting by + and take out words starting by -
-            //to make highlight works properly
-            $searchterms = explode(' ', $hook);    // Search for words independently
+            // We have to strip any word starting by + and take out words starting by -
+            // to make highlight works properly.
+            $searchterms = explode(' ', $hook);    // Search for words independently.
             foreach ($searchterms as $key => $searchterm) {
-                if (preg_match('/^\-/',$searchterm)) {
+                if (preg_match('/^\-/', $searchterm)) {
                     unset($searchterms[$key]);
                 } else {
-                    $searchterms[$key] = preg_replace('/^\+/','',$searchterm);
+                    $searchterms[$key] = preg_replace('/^\+/', '', $searchterm);
                 }
-                //Avoid highlight of <2 len strings. It's a well known hilight limitation.
+                // Avoid highlight of <2 len strings. It's a well known highlight limitation.
                 if (strlen($searchterm) < 2) {
                     unset($searchterms[$key]);
                 }
             }
-            $strippedsearch = implode(' ', $searchterms);    // Rebuild the string
+            $strippedsearch = implode(' ', $searchterms);    // Rebuild the string.
             $entry->highlight = $strippedsearch;
         }
 
-        /// and finally print the entry.
-        glossary_print_entry($course, $cm, $glossary, $entry, $mode, $hook,1,$displayformat);
+        // And finally print the entry.
+        glossary_print_entry($course, $cm, $glossary, $entry, $mode, $hook, 1, $displayformat);
         $entriesshown++;
     }
 }
 if ( !$entriesshown ) {
-    echo $OUTPUT->box(get_string("noentries","glossary"), "generalbox boxaligncenter boxwidthwide");
+    echo $OUTPUT->box(get_string("noentries", "glossary"), "generalbox boxaligncenter boxwidthwide");
 }
 
 if (!empty($formsent)) {
-    // close the form properly if used
+    // Close the form properly if used.
     echo "</div>";
     echo "</form>";
 }
@@ -503,5 +524,5 @@ if ( $paging ) {
 echo '<br />';
 glossary_print_tabbed_table_end();
 
-/// Finish the page
+// Finish the page.
 echo $OUTPUT->footer();

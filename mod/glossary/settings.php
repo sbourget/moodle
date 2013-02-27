@@ -1,4 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Glossary printer friendly view
+ *
+ * @package    mod_glossary
+ * @copyright  2007 onwards Petr Skoda  {@link http://skodak.org}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -48,21 +70,22 @@ if ($ADMIN->fulltree) {
                        get_string('cnffullmatch', 'glossary'), 0));
 
 
-    //Update and get available formats
+    // Update and get available formats.
     $recformats = glossary_get_available_formats();
     $formats = array();
-    //Take names
+    // Take names.
     foreach ($recformats as $format) {
         $formats[$format->id] = get_string("displayformat$format->name", "glossary");
     }
     asort($formats);
 
     $str = '<table>';
-    foreach ($formats as $formatid=>$formatname) {
+    foreach ($formats as $formatid => $formatname) {
         $recformat = $DB->get_record('glossary_formats', array('id'=>$formatid));
         $str .= '<tr>';
         $str .= '<td>' . $formatname . '</td>';
-        $eicon = "<a title=\"".get_string("edit")."\" href=\"$CFG->wwwroot/mod/glossary/formats.php?id=$formatid&amp;mode=edit\"><img class=\"iconsmall\" src=\"".$OUTPUT->pix_url('t/edit')."\" alt=\"".get_string("edit")."\" /></a>";
+        $eicon = "<a title=\"".get_string("edit")."\" href=\"$CFG->wwwroot/mod/glossary/formats.php?id=$formatid&amp;mode=edit\"><img class=\"iconsmall\" src=\""
+                 .$OUTPUT->pix_url('t/edit')."\" alt=\"".get_string("edit")."\" /></a>";
         if ( $recformat->visible ) {
             $vtitle = get_string("hide");
             $vicon  = "t/hide";
@@ -70,7 +93,8 @@ if ($ADMIN->fulltree) {
             $vtitle = get_string("show");
             $vicon  = "t/show";
         }
-        $vicon = "<a title=\"".$vtitle."\" href=\"$CFG->wwwroot/mod/glossary/formats.php?id=$formatid&amp;mode=visible&amp;sesskey=".sesskey()."\"><img class=\"iconsmall\" src=\"".$OUTPUT->pix_url($vicon)."\" alt=\"$vtitle\" /></a>";
+        $vicon = "<a title=\"".$vtitle."\" href=\"$CFG->wwwroot/mod/glossary/formats.php?id=$formatid&amp;mode=visible&amp;sesskey="
+                 .sesskey()."\"><img class=\"iconsmall\" src=\"".$OUTPUT->pix_url($vicon)."\" alt=\"$vtitle\" /></a>";
 
         $str .= '<td align="center">'.$eicon.'&nbsp;&nbsp;'.$vicon.'</td>';
         $str .= '</tr>';

@@ -1,4 +1,27 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * This file is used to dieplay entries
+ *
+ * @package    mod_glossary
+ * @copyright  2010 onwards Andrew Davis
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 define('AJAX_SCRIPT', true);
 
 require_once('../../config.php');
@@ -7,8 +30,8 @@ require_once($CFG->libdir . '/filelib.php');
 
 $concept  = optional_param('concept', '', PARAM_CLEAN);
 $courseid = optional_param('courseid', 0, PARAM_INT);
-$eid      = optional_param('eid', 0, PARAM_INT); // glossary entry id
-$displayformat = optional_param('displayformat',-1, PARAM_SAFEDIR);
+$eid      = optional_param('eid', 0, PARAM_INT); // Glossary entry id.
+$displayformat = optional_param('displayformat', -1, PARAM_SAFEDIR);
 
 $url = new moodle_url('/mod/glossary/showentry.php');
 $url->param('concept', $concept);
@@ -44,15 +67,15 @@ if ($eid) {
 if ($entries) {
     foreach ($entries as $key => $entry) {
         // Need to get the course where the entry is,
-        // in order to check for visibility/approve permissions there
+        // in order to check for visibility/approve permissions there.
         $entrycourse = $DB->get_record('course', array('id' => $entry->courseid), '*', MUST_EXIST);
         $modinfo = get_fast_modinfo($entrycourse);
-        // make sure the entry is visible
+        // Make sure the entry is visible.
         if (empty($modinfo->cms[$entry->cmid]->uservisible)) {
             unset($entries[$key]);
             continue;
         }
-        // make sure the entry is approved (or approvable by current user)
+        // Make sure the entry is approved (or approvable by current user).
         if (!$entry->approved and ($USER->id != $entry->userid)) {
             $context = context_module::instance($entry->cmid);
             if (!has_capability('mod/glossary:approve', $context)) {
@@ -76,7 +99,8 @@ if ($entries) {
             $entries[$key]->attachments = html_writer::tag('p', $attachments);
         }
 
-        $entries[$key]->footer = "<p style=\"text-align:right\">&raquo;&nbsp;<a href=\"$CFG->wwwroot/mod/glossary/view.php?g=$entry->glossaryid\">".format_string($entry->glossaryname,true)."</a></p>";
+        $entries[$key]->footer = "<p style=\"text-align:right\">&raquo;&nbsp;<a href=\"$CFG->wwwroot/mod/glossary/view.php?g=$entry->glossaryid\">"
+                                 .format_string($entry->glossaryname, true)."</a></p>";
         add_to_log($entry->courseid, 'glossary', 'view entry', "showentry.php?eid=$entry->id", $entry->id, $entry->cmid);
     }
 }

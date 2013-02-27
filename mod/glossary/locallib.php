@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -19,7 +18,7 @@
  * Library of functions and constants for module glossary
  * outside of what is required for the core moodle api
  *
- * @package   mod-glossary
+ * @package   mod_glossary
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -34,7 +33,7 @@ class glossary_full_portfolio_caller extends portfolio_module_caller_base {
 
     private $glossary;
     private $exportdata;
-    private $keyedfiles = array(); // keyed on entry
+    private $keyedfiles = array(); // Keyed on entry.
 
     /**
      * return array of expected call back arguments
@@ -84,7 +83,7 @@ class glossary_full_portfolio_caller extends portfolio_module_caller_base {
     }
 
     /**
-     * how long might we expect this export to take
+     * How long might we expect this export to take.
      *
      * @return constant one of PORTFOLIO_TIME_XX
      */
@@ -95,7 +94,7 @@ class glossary_full_portfolio_caller extends portfolio_module_caller_base {
     }
 
     /**
-     * return the sha1 of this content
+     * Return the sha1 of this content.
      *
      * @return string
      */
@@ -108,7 +107,7 @@ class glossary_full_portfolio_caller extends portfolio_module_caller_base {
     }
 
     /**
-     * prepare the package ready to be passed off to the portfolio plugin
+     * Prepare the package ready to be passed off to the portfolio plugin.
      *
      * @return void
      */
@@ -137,7 +136,7 @@ class glossary_full_portfolio_caller extends portfolio_module_caller_base {
             $this->exporter->write_new_file($csv, clean_filename($this->cm->name) . '.csv', false);
             return;
         } else if ($this->get('exporter')->get('formatclass') == PORTFOLIO_FORMAT_LEAP2A) {
-            $ids = array(); // keep track of these to make into a selection later
+            $ids = array(); // Keep track of these to make into a selection later.
             global $USER, $DB;
             $writer = $this->get('exporter')->get('format')->leap2a_writer($USER);
             $format = $this->exporter->get('format');
@@ -163,9 +162,9 @@ class glossary_full_portfolio_caller extends portfolio_module_caller_base {
                 }
                 if (!empty($categories[$e->id])) {
                     foreach ($categories[$e->id] as $cat) {
-                        // this essentially treats them as plain tags
+                        // This essentially treats them as plain tags
                         // leap has the idea of category schemes
-                        // but I think this is overkill here
+                        // but I think this is overkill here.
                         $entry->add_category($cat);
                     }
                 }
@@ -181,7 +180,7 @@ class glossary_full_portfolio_caller extends portfolio_module_caller_base {
     }
 
     /**
-     * make sure that the current user is allowed to do this
+     * Make sure that the current user is allowed to do this.
      *
      * @return boolean
      */
@@ -190,7 +189,7 @@ class glossary_full_portfolio_caller extends portfolio_module_caller_base {
     }
 
     /**
-     * return a nice name to be displayed about this export location
+     * Return a nice name to be displayed about this export location.
      *
      * @return string
      */
@@ -199,7 +198,7 @@ class glossary_full_portfolio_caller extends portfolio_module_caller_base {
     }
 
     /**
-     * what formats this function *generally* supports
+     * What formats this function *generally* supports.
      *
      * @return array
      */
@@ -211,7 +210,7 @@ class glossary_full_portfolio_caller extends portfolio_module_caller_base {
 /**
  * class to export a single glossary entry
  *
- * @package   mod-glossary
+ * @package   mod_glossary
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -247,7 +246,7 @@ class glossary_entry_portfolio_caller extends portfolio_module_caller_base {
             if (!$this->entry = $DB->get_record('glossary_entries', array('id' => $this->entryid))) {
                 throw new portfolio_caller_exception('noentry', 'glossary');
             }
-            // in case we don't have USER this will make the entry be printed
+            // In case we don't have USER this will make the entry be printed.
             $this->entry->approved = true;
         }
         $this->categories = $DB->get_records_sql('SELECT ec.entryid, c.name FROM {glossary_entries_categories} ec
@@ -341,9 +340,9 @@ class glossary_entry_portfolio_caller extends portfolio_module_caller_base {
             }
             if ($this->categories) {
                 foreach ($this->categories as $cat) {
-                    // this essentially treats them as plain tags
+                    // This essentially treats them as plain tags
                     // leap has the idea of category schemes
-                    // but I think this is overkill here
+                    // but I think this is overkill here.
                     $entry->add_category($cat->name);
                 }
             }

@@ -1,6 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/// This file allows to manage the default behaviour of the display formats
+/**
+ * This file allows to manage the default behaviour of the display formats
+ *
+ * @package    mod_glossary
+ * @copyright  2003 onwards Williams Castillo (castillow@tutopia.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once("../../config.php");
 require_once($CFG->libdir.'/adminlib.php');
@@ -15,7 +35,7 @@ if ($mode !== '') {
 }
 $PAGE->set_url($url);
 
-admin_externalpage_setup('managemodules'); // this is hacky, tehre should be a special hidden page for it
+admin_externalpage_setup('managemodules'); // This is hacky, there should be a special hidden page for it.
 
 if ( !$displayformat = $DB->get_record("glossary_formats", array("id"=>$id))) {
     print_error('invalidglossaryformat', 'glossary');
@@ -29,11 +49,11 @@ if ( $mode == 'visible' and confirm_sesskey()) {
         } else {
             $displayformat->visible = 1;
         }
-        $DB->update_record("glossary_formats",$displayformat);
+        $DB->update_record("glossary_formats", $displayformat);
     }
     redirect("$CFG->wwwroot/$CFG->admin/settings.php?section=modsettingglossary#glossary_formats_header");
     die;
-} elseif ( $mode == 'edit' and $form and confirm_sesskey()) {
+} else if ( $mode == 'edit' and $form and confirm_sesskey()) {
 
     $displayformat->popupformatname = $form->popupformatname;
     $displayformat->showgroup   = $form->showgroup;
@@ -42,17 +62,17 @@ if ( $mode == 'visible' and confirm_sesskey()) {
     $displayformat->sortkey     = $form->sortkey;
     $displayformat->sortorder   = $form->sortorder;
 
-    $DB->update_record("glossary_formats",$displayformat);
+    $DB->update_record("glossary_formats", $displayformat);
     redirect("$CFG->wwwroot/$CFG->admin/settings.php?section=modsettingglossary#glossary_formats_header");
     die;
 }
 
 $strmodulename = get_string("modulename", "glossary");
-$strdisplayformats = get_string("displayformats","glossary");
+$strdisplayformats = get_string("displayformats", "glossary");
 
 echo $OUTPUT->header();
 
-echo $OUTPUT->heading($strmodulename . ': ' . get_string("displayformats","glossary"));
+echo $OUTPUT->heading($strmodulename . ': ' . get_string("displayformats", "glossary"));
 
 echo $OUTPUT->box(get_string("configwarning", 'admin'), "generalbox boxaligncenter boxwidthnormal");
 echo "<br />";
@@ -65,23 +85,23 @@ echo '<table width="90%" align="center" class="generalbox">';
 ?>
 <tr>
     <td colspan="3" align="center"><strong>
-    <?php echo get_string('displayformat'.$displayformat->name,'glossary'); ?>
+    <?php echo get_string('displayformat'.$displayformat->name, 'glossary'); ?>
     </strong></td>
 </tr>
 <tr valign="top">
-    <td align="right" width="20%"><?php echo html_writer::label(get_string('popupformat','glossary'), 'menupopupformatname'); ?></td>
+    <td align="right" width="20%"><?php echo html_writer::label(get_string('popupformat', 'glossary'), 'menupopupformatname'); ?></td>
     <td>
  <?php
-    //get and update available formats
+    // Get and update available formats.
     $recformats = glossary_get_available_formats();
 
     $formats = array();
 
-    //Take names
+    // Take names.
     foreach ($recformats as $format) {
        $formats[$format->name] = get_string("displayformat$format->name", "glossary");
     }
-    //Sort it
+    // Sort it.
     asort($formats);
 
     echo html_writer::select($formats, 'popupformatname', $displayformat->popupformatname, false);
@@ -92,7 +112,7 @@ echo '<table width="90%" align="center" class="generalbox">';
     </td>
 </tr>
 <tr valign="top">
-    <td align="right" width="20%"><label for="defaultmode"><?php print_string('defaultmode','glossary'); ?></label></td>
+    <td align="right" width="20%"><label for="defaultmode"><?php print_string('defaultmode', 'glossary'); ?></label></td>
     <td>
     <select size="1" id="defaultmode" name="defaultmode">
 <?php
@@ -129,7 +149,7 @@ echo '<table width="90%" align="center" class="generalbox">';
     </td>
 </tr>
 <tr valign="top">
-    <td align="right" width="20%"><label for="defaulthook"><?php print_string('defaulthook','glossary'); ?></label></td>
+    <td align="right" width="20%"><label for="defaulthook"><?php print_string('defaulthook', 'glossary'); ?></label></td>
     <td>
     <select size="1" id="defaulthook" name="defaulthook">
 <?php
@@ -155,10 +175,10 @@ echo '<table width="90%" align="center" class="generalbox">';
     break;
     }
 ?>
-    <option value="ALL" <?php p($sall)?>><?php p(get_string("allentries","glossary"))?></option>
-    <option value="SPECIAL" <?php p($sspecial)?>><?php p(get_string("special","glossary"))?></option>
-    <option value="0" <?php p($sallcategories)?>><?php p(get_string("allcategories","glossary"))?></option>
-    <option value="-1" <?php p($snocategorised)?>><?php p(get_string("notcategorised","glossary"))?></option>
+    <option value="ALL" <?php p($sall)?>><?php p(get_string("allentries", "glossary"))?></option>
+    <option value="SPECIAL" <?php p($sspecial)?>><?php p(get_string("special", "glossary"))?></option>
+    <option value="0" <?php p($sallcategories)?>><?php p(get_string("allcategories", "glossary"))?></option>
+    <option value="-1" <?php p($snocategorised)?>><?php p(get_string("notcategorised", "glossary"))?></option>
     </select>
     </td>
     <td width="60%">
@@ -166,7 +186,7 @@ echo '<table width="90%" align="center" class="generalbox">';
     </td>
 </tr>
 <tr valign="top">
-    <td align="right" width="20%"><label for="sortkey"><?php print_string('defaultsortkey','glossary'); ?></label></td>
+    <td align="right" width="20%"><label for="sortkey"><?php print_string('defaultsortkey', 'glossary'); ?></label></td>
     <td>
     <select size="1" id="sortkey" name="sortkey">
 <?php
@@ -192,8 +212,8 @@ echo '<table width="90%" align="center" class="generalbox">';
     break;
     }
 ?>
-    <option value="CREATION" <?php p($screation)?>><?php p(get_string("sortbycreation","glossary"))?></option>
-    <option value="UPDATE" <?php p($supdate)?>><?php p(get_string("sortbylastupdate","glossary"))?></option>
+    <option value="CREATION" <?php p($screation)?>><?php p(get_string("sortbycreation", "glossary"))?></option>
+    <option value="UPDATE" <?php p($supdate)?>><?php p(get_string("sortbylastupdate", "glossary"))?></option>
     <option value="FIRSTNAME" <?php p($sfname)?>><?php p(get_string("firstname"))?></option>
     <option value="LASTNAME" <?php p($slname)?>><?php p(get_string("lastname"))?></option>
     </select>
@@ -203,7 +223,7 @@ echo '<table width="90%" align="center" class="generalbox">';
     </td>
 </tr>
 <tr valign="top">
-    <td align="right" width="20%"><label for="sortorder"><?php print_string('defaultsortorder','glossary'); ?></label></td>
+    <td align="right" width="20%"><label for="sortorder"><?php print_string('defaultsortorder', 'glossary'); ?></label></td>
     <td>
     <select size="1" id="sortorder" name="sortorder">
 <?php
@@ -219,8 +239,8 @@ echo '<table width="90%" align="center" class="generalbox">';
     break;
     }
 ?>
-    <option value="asc" <?php p($sasc)?>><?php p(get_string("ascending","glossary"))?></option>
-    <option value="desc" <?php p($sdesc)?>><?php p(get_string("descending","glossary"))?></option>
+    <option value="asc" <?php p($sasc)?>><?php p(get_string("ascending", "glossary"))?></option>
+    <option value="desc" <?php p($sdesc)?>><?php p(get_string("descending", "glossary"))?></option>
     </select>
     </td>
     <td width="60%">
@@ -260,4 +280,3 @@ echo '<table width="90%" align="center" class="generalbox">';
 echo '</table></form>';
 
 echo $OUTPUT->footer();
-?>

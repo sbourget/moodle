@@ -1,11 +1,33 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Glossary module edit page
+ *
+ * @package    mod_glossary
+ * @copyright  2003 onwards Williams Castillo (castillow@tutopia.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once('../../config.php');
 require_once('lib.php');
 require_once('edit_form.php');
 
-$cmid = required_param('cmid', PARAM_INT);            // Course Module ID
-$id   = optional_param('id', 0, PARAM_INT);           // EntryID
+$cmid = required_param('cmid', PARAM_INT);            // Course Module ID.
+$id   = optional_param('id', 0, PARAM_INT);           // EntryID.
 
 if (!$cm = get_coursemodule_from_id('glossary', $cmid)) {
     print_error('invalidcoursemodule');
@@ -29,7 +51,7 @@ if (!empty($id)) {
 }
 $PAGE->set_url($url);
 
-if ($id) { // if entry is specified
+if ($id) { // If entry is specified.
     if (isguestuser()) {
         print_error('guestnoedit', 'glossary', "$CFG->wwwroot/mod/glossary/view.php?id=$cmid");
     }
@@ -42,29 +64,29 @@ if ($id) { // if entry is specified
     if (!has_capability('mod/glossary:manageentries', $context) and !($entry->userid == $USER->id and ($ineditperiod and has_capability('mod/glossary:write', $context)))) {
         if ($USER->id != $fromdb->userid) {
             print_error('errcannoteditothers', 'glossary', "view.php?id=$cm->id&amp;mode=entry&amp;hook=$id");
-        } elseif (!$ineditperiod) {
+        } else if (!$ineditperiod) {
             print_error('erredittimeexpired', 'glossary', "view.php?id=$cm->id&amp;mode=entry&amp;hook=$id");
         }
     }
 
-    //prepare extra data
+    // Prepare extra data.
     if ($aliases = $DB->get_records_menu("glossary_alias", array("entryid"=>$id), '', 'id, alias')) {
         $entry->aliases = implode("\n", $aliases) . "\n";
     }
     if ($categoriesarr = $DB->get_records_menu("glossary_entries_categories", array('entryid'=>$id), '', 'id, categoryid')) {
-        // TODO: this fetches cats from both main and secondary glossary :-(
+        // TODO: this fetches categories from both main and secondary glossary.
         $entry->categories = array_values($categoriesarr);
     }
 
-} else { // new entry
+} else { // New Entry.
     require_capability('mod/glossary:write', $context);
-    // note: guest user does not have any write capability
+    // Note: guest user does not have any write capability.
     $entry = new stdClass();
     $entry->id = null;
 }
 
-$maxfiles = 99;                // TODO: add some setting
-$maxbytes = $course->maxbytes; // TODO: add some setting
+$maxfiles = 99;                // TODO: add some setting (MDL-38264).
+$maxbytes = $course->maxbytes; // TODO: add some setting (MDL-38264).
 
 $definitionoptions = array('trusttext'=>true, 'subdirs'=>false, 'maxfiles'=>$maxfiles, 'maxbytes'=>$maxbytes, 'context'=>$context);
 $attachmentoptions = array('subdirs'=>false, 'maxfiles'=>$maxfiles, 'maxbytes'=>$maxbytes);
@@ -74,12 +96,12 @@ $entry = file_prepare_standard_filemanager($entry, 'attachment', $attachmentopti
 
 $entry->cmid = $cm->id;
 
-// create form and set initial data
+// Create form and set initial data.
 $mform = new mod_glossary_entry_form(null, array('current'=>$entry, 'cm'=>$cm, 'glossary'=>$glossary,
                                                  'definitionoptions'=>$definitionoptions, 'attachmentoptions'=>$attachmentoptions));
 
-if ($mform->is_cancelled()){
-    if ($id){
+if ($mform->is_cancelled()) {
+    if ($id) {
         redirect("view.php?id=$cm->id&mode=entry&hook=$id");
     } else {
         redirect("view.php?id=$cm->id");
@@ -103,9 +125,9 @@ if ($mform->is_cancelled()){
     }
 
     $entry->concept          = trim($entry->concept);
-    $entry->definition       = '';          // updated later
-    $entry->definitionformat = FORMAT_HTML; // updated later
-    $entry->definitiontrust  = 0;           // updated later
+    $entry->definition       = '';          // Updated later.
+    $entry->definitionformat = FORMAT_HTML; // Updated later.
+    $entry->definitiontrust  = 0;           // Updated later.
     $entry->timemodified     = $timenow;
     $entry->approved         = 0;
     $entry->usedynalink      = isset($entry->usedynalink) ?   $entry->usedynalink : 0;
@@ -117,10 +139,10 @@ if ($mform->is_cancelled()){
     }
 
     if (empty($entry->id)) {
-        //new entry
+        // New entry.
         $entry->id = $DB->insert_record('glossary_entries', $entry);
 
-        // Update completion state
+        // Update completion state.
         $completion = new completion_info($course);
         if ($completion->is_enabled($cm) == COMPLETION_TRACKING_AUTOMATIC && $glossary->completionentries && $entry->approved) {
             $completion->update_state($cm, COMPLETION_COMPLETE);
@@ -130,26 +152,26 @@ if ($mform->is_cancelled()){
                    "view.php?id=$cm->id&amp;mode=entry&amp;hook=$entry->id", $entry->id, $cm->id);
 
     } else {
-        //existing entry
+        // Existing entry.
         $DB->update_record('glossary_entries', $entry);
         add_to_log($course->id, "glossary", "update entry",
                    "view.php?id=$cm->id&amp;mode=entry&amp;hook=$entry->id",
                    $entry->id, $cm->id);
     }
 
-    // save and relink embedded images and save attachments
+    // Save and relink embedded images and save attachments.
     $entry = file_postupdate_standard_editor($entry, 'definition', $definitionoptions, $context, 'mod_glossary', 'entry', $entry->id);
     $entry = file_postupdate_standard_filemanager($entry, 'attachment', $attachmentoptions, $context, 'mod_glossary', 'attachment', $entry->id);
 
-    // store the updated value values
+    // Store the updated value values.
     $DB->update_record('glossary_entries', $entry);
 
-    //refetch complete entry
+    // Refetch complete entry.
     $entry = $DB->get_record('glossary_entries', array('id'=>$entry->id));
 
-    // update entry categories
+    // Update entry categories.
     $DB->delete_records('glossary_entries_categories', array('entryid'=>$entry->id));
-    // TODO: this deletes cats from both both main and secondary glossary :-(
+    // TODO: this deletes cats from both both main and secondary glossary.
     if (!empty($categories) and array_search(0, $categories) === false) {
         foreach ($categories as $catid) {
             $newcategory = new stdClass();
@@ -159,7 +181,7 @@ if ($mform->is_cancelled()){
         }
     }
 
-    // update aliases
+    // Update aliases.
     $DB->delete_records('glossary_alias', array('entryid'=>$entry->id));
     if ($aliases !== '') {
         $aliases = explode("\n", $aliases);
@@ -189,4 +211,3 @@ echo $OUTPUT->heading(format_string($glossary->name));
 $mform->display();
 
 echo $OUTPUT->footer();
-

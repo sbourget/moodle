@@ -46,7 +46,7 @@ class restore_glossary_activity_structure_step extends restore_activity_structur
                                                 '/activity/glossary/categories/category/category_entries/category_entry');
         }
 
-        // Return the paths wrapped into standard activity structure
+        // Return the paths wrapped into standard activity structure.
         return $this->prepare_activity_structure($paths);
     }
 
@@ -59,20 +59,20 @@ class restore_glossary_activity_structure_step extends restore_activity_structur
 
         $data->assesstimestart = $this->apply_date_offset($data->assesstimestart);
         $data->assesstimefinish = $this->apply_date_offset($data->assesstimefinish);
-        if ($data->scale < 0) { // scale found, get mapping
+        if ($data->scale < 0) { // A scale was found, get the mapping.
             $data->scale = -($this->get_mappingid('scale', abs($data->scale)));
         }
-        $formats = get_list_of_plugins('mod/glossary/formats'); // Check format
+        $formats = get_list_of_plugins('mod/glossary/formats'); // Check format.
         if (!in_array($data->displayformat, $formats)) {
             $data->displayformat = 'dictionary';
         }
         if (!empty($data->mainglossary) and $data->mainglossary == 1 and
             $DB->record_exists('glossary', array('mainglossary' => 1, 'course' => $this->get_courseid()))) {
-            // Only allow one main glossary in the course
+            // Only allow one main glossary in the course.
             $data->mainglossary = 0;
         }
 
-        // insert the glossary record
+        // Insert the glossary record.
         $newitemid = $DB->insert_record('glossary', $data);
         $this->apply_activity_instance($newitemid);
     }
@@ -90,9 +90,9 @@ class restore_glossary_activity_structure_step extends restore_activity_structur
         $data->timecreated = $this->apply_date_offset($data->timecreated);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
 
-        // insert the entry record
+        // Insert the entry record.
         $newitemid = $DB->insert_record('glossary_entries', $data);
-        $this->set_mapping('glossary_entry', $oldid, $newitemid, true); // childs and files by itemname
+        $this->set_mapping('glossary_entry', $oldid, $newitemid, true); // Childs and files by itemname.
     }
 
     protected function process_glossary_alias($data) {
@@ -111,10 +111,10 @@ class restore_glossary_activity_structure_step extends restore_activity_structur
 
         $data = (object)$data;
 
-        // Cannot use ratings API, cause, it's missing the ability to specify times (modified/created)
+        // Cannot use ratings API, cause, it's missing the ability to specify times (modified/created).
         $data->contextid = $this->task->get_contextid();
         $data->itemid    = $this->get_new_parentid('glossary_entry');
-        if ($data->scaleid < 0) { // scale found, get mapping
+        if ($data->scaleid < 0) { // Scale found, get mapping.
             $data->scaleid = -($this->get_mappingid('scale', abs($data->scaleid)));
         }
         $data->rating = $data->value;
@@ -157,9 +157,9 @@ class restore_glossary_activity_structure_step extends restore_activity_structur
     }
 
     protected function after_execute() {
-        // Add glossary related files, no need to match by itemname (just internally handled context)
+        // Add glossary related files, no need to match by itemname (just internally handled context).
         $this->add_related_files('mod_glossary', 'intro', null);
-        // Add entries related files, matching by itemname (glossary_entry)
+        // Add entries related files, matching by itemname (glossary_entry).
         $this->add_related_files('mod_glossary', 'entry', 'glossary_entry');
         $this->add_related_files('mod_glossary', 'attachment', 'glossary_entry');
     }

@@ -2,7 +2,8 @@ Glossary version 0.5 dev
 ------------------------
 By Williams Castillo (castillow@tutopia.com)
 
-This is the Glossary module. Created and maintained by Williams Castillo. This are my first lines in PHP... It means that, although I've tried to do my best, it might (in fact, it does) shows my inexperience... in PHP... and moodle as well.
+This is the Glossary module. Created and maintained by Williams Castillo. This are my first lines in PHP... 
+It means that, although I've tried to do my best, it might (in fact, it does) shows my inexperience... in PHP... and moodle as well.
 
 Basically, this module allows you to maintain a repository of data in the form of concepts, Entry->Definitions, etc. Thus:
 

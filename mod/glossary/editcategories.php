@@ -1,18 +1,37 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/// This page allows to edit entries categories for a particular instance of glossary
+/**
+ * This page allows to edit entries categories for a particular instance of glossary
+ *
+ * @package    mod_glossary
+ * @copyright  2003 onwards Williams Castillo (castillow@tutopia.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once("../../config.php");
 require_once("lib.php");
 
-$id = required_param('id', PARAM_INT);                       // Course Module ID, or
-$usedynalink = optional_param('usedynalink', 0, PARAM_INT);  // category ID
-$confirm     = optional_param('confirm', 0, PARAM_INT);      // confirm the action
-$name        = optional_param('name', '', PARAM_CLEAN);  // confirm the name
-
-$action = optional_param('action', '', PARAM_ALPHA ); // what to do
-$hook   = optional_param('hook', '', PARAM_ALPHANUM); // category ID
-$mode   = optional_param('mode', '', PARAM_ALPHA);   // cat
+$id          = required_param('id', PARAM_INT);             // Course Module ID.
+$usedynalink = optional_param('usedynalink', 0, PARAM_INT); // Category ID.
+$confirm     = optional_param('confirm', 0, PARAM_INT);     // Confirm the action.
+$name        = optional_param('name', '', PARAM_CLEAN);     // Confirm the name.
+$action      = optional_param('action', '', PARAM_ALPHA );  // What to do.
+$hook        = optional_param('hook', '', PARAM_ALPHANUM);  // Category ID.
+$mode        = optional_param('mode', '', PARAM_ALPHA);     // Cat.
 
 $action = strtolower($action);
 
@@ -52,7 +71,7 @@ if (! $glossary = $DB->get_record("glossary", array("id"=>$cm->instance))) {
 
 if ($hook > 0) {
     if ($category = $DB->get_record("glossary_categories", array("id"=>$hook))) {
-        //Check it belongs to the same glossary
+        // Check it belongs to the same glossary.
         if ($category->glossaryid != $glossary->id) {
             print_error('invalidid', 'glossary');
         }
@@ -70,20 +89,20 @@ $strglossaries   = get_string("modulenameplural", "glossary");
 $strglossary     = get_string("modulename", "glossary");
 
 $PAGE->navbar->add($strglossaries, new moodle_url('/mod/glossary/index.php', array('id'=>$course->id)));
-$PAGE->navbar->add(get_string("categories","glossary"));
+$PAGE->navbar->add(get_string("categories", "glossary"));
 if (!empty($action)) {
-    $navaction = get_string($action). " " . textlib::strtolower(get_string("category","glossary"));
+    $navaction = get_string($action). " " . textlib::strtolower(get_string("category", "glossary"));
     $PAGE->navbar->add($navaction);
 }
 $PAGE->set_title(format_string($glossary->name));
 $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 
-// Prepare format_string/text options
+// Prepare format_string/text options.
 $fmtoptions = array(
     'context' => $context);
 
-if (right_to_left()) { // RTL table alignment support
+if (right_to_left()) { // RTL table alignment support.
     $rightalignment = 'left';
     $leftalignment = 'right';
 } else {
@@ -103,44 +122,44 @@ if ( $hook >0 ) {
             $cat->usedynalink = $usedynalink;
 
             $DB->update_record("glossary_categories", $cat);
-            add_to_log($course->id, "glossary", "edit category", "editcategories.php?id=$cm->id", $hook,$cm->id);
+            add_to_log($course->id, "glossary", "edit category", "editcategories.php?id=$cm->id", $hook, $cm->id);
 
         } else {
-            echo "<h3 class=\"main\">" . get_string("edit"). " " . get_string("category","glossary") . "</h3>";
+            echo "<h3 class=\"main\">" . get_string("edit"). " " . get_string("category", "glossary") . "</h3>";
 
             $name = $category->name;
             $usedynalink = $category->usedynalink;
-            require "editcategories.html";
+            require("editcategories.html");
             echo $OUTPUT->footer();
             die;
         }
 
-    } elseif ( $action == "delete" ) {
+    } else if ( $action == "delete" ) {
         if ( $confirm ) {
             $DB->delete_records("glossary_entries_categories", array("categoryid"=>$hook));
             $DB->delete_records("glossary_categories", array("id"=>$hook));
 
             echo $OUTPUT->box_start('generalbox boxaligncenter errorboxcontent boxwidthnarrow');
-            echo "<div>" . get_string("categorydeleted","glossary") ."</div>";
+            echo "<div>" . get_string("categorydeleted", "glossary") ."</div>";
             echo $OUTPUT->box_end();
 
-            add_to_log($course->id, "glossary", "delete category", "editcategories.php?id=$cm->id", $hook,$cm->id);
+            add_to_log($course->id, "glossary", "delete category", "editcategories.php?id=$cm->id", $hook, $cm->id);
 
             redirect("editcategories.php?id=$cm->id");
         } else {
-            echo "<p>" . get_string("delete"). " " . get_string("category","glossary"). "</p>";
+            echo "<p>" . get_string("delete"). " " . get_string("category", "glossary"). "</p>";
 
             echo $OUTPUT->box_start('generalbox boxaligncenter errorboxcontent boxwidthnarrow');
             echo "<div class=\"boxaligncenter deletecatconfirm\">".format_string($category->name, true, $fmtoptions)."<br/>";
 
             $num_entries = $DB->count_records("glossary_entries_categories", array("categoryid"=>$category->id));
             if ( $num_entries ) {
-                print_string("deletingnoneemptycategory","glossary");
+                print_string("deletingnoneemptycategory", "glossary");
             }
             echo "<p>";
-            print_string("areyousuredelete","glossary");
+            print_string("areyousuredelete", "glossary");
             echo "</p>";
-?>
+            ?>
 
                 <table border="0" width="100" class="confirmbuttons">
                     <tr>
@@ -158,7 +177,7 @@ if ( $hook >0 ) {
                         </td>
                         <td align="$leftalignment" style="width:50%">
 
-<?php
+            <?php
             unset($options);
             $options = array ("id" => $id);
             echo $OUTPUT->single_button(new moodle_url("editcategories.php", $options), get_string("no"));
@@ -168,14 +187,14 @@ if ( $hook >0 ) {
         }
     }
 
-} elseif ( $action == "add" ) {
+} else if ( $action == "add" ) {
     if ( $confirm ) {
-        $dupcategory = $DB->get_records_sql("SELECT * FROM {glossary_categories} WHERE ".$DB->sql_like('name','?', false)." AND glossaryid=?", array($name, $glossary->id));
+        $dupcategory = $DB->get_records_sql("SELECT * FROM {glossary_categories} WHERE ".$DB->sql_like('name', '?', false)." AND glossaryid=?", array($name, $glossary->id));
         if ( $dupcategory ) {
-        echo "<h3 class=\"main\">" . get_string("add"). " " . get_string("category","glossary"). "</h3>";
+            echo "<h3 class=\"main\">" . get_string("add"). " " . get_string("category", "glossary"). "</h3>";
 
             echo $OUTPUT->box_start('generalbox boxaligncenter errorboxcontent boxwidthnarrow');
-            echo "<div>" . get_string("duplicatecategory","glossary") ."</div>";
+            echo "<div>" . get_string("duplicatecategory", "glossary") ."</div>";
             echo $OUTPUT->box_end();
 
             redirect("editcategories.php?id=$cm->id&amp;action=add&amp;name=$name");
@@ -188,12 +207,12 @@ if ( $hook >0 ) {
             $cat->glossaryid = $glossary->id;
 
             $cat->id = $DB->insert_record("glossary_categories", $cat);
-            add_to_log($course->id, "glossary", "add category", "editcategories.php?id=$cm->id", $cat->id,$cm->id);
+            add_to_log($course->id, "glossary", "add category", "editcategories.php?id=$cm->id", $cat->id, $cm->id);
         }
     } else {
-        echo "<h3 class=\"main\">" . get_string("add"). " " . get_string("category","glossary"). "</h3>";
+        echo "<h3 class=\"main\">" . get_string("add"). " " . get_string("category", "glossary"). "</h3>";
         $name="";
-        require "editcategories.html";
+        require("editcategories.html");
     }
 }
 
@@ -208,7 +227,7 @@ if ( $action ) {
 <table width="40%" class="boxaligncenter generalbox" cellpadding="5">
         <tr>
           <th style="width:90%" align="center">
-          <?php p(get_string("categories","glossary")) ?></th>
+          <?php p(get_string("categories", "glossary")) ?></th>
           <th style="width:10%" align="center">
           <?php p(get_string("action")) ?></th>
         </tr>
@@ -219,7 +238,7 @@ if ( $action ) {
 <?php
     $categories = $DB->get_records("glossary_categories", array("glossaryid"=>$glossary->id), "name ASC");
 
-    if ( $categories ) {
+    if ($categories) {
         echo '<table width="100%">';
         foreach ($categories as $category) {
             $num_entries = $DB->count_records("glossary_entries_categories", array("categoryid"=>$category->id));
@@ -228,22 +247,24 @@ if ( $action ) {
              <tr>
                <td style="width:80%" align="$leftalignment">
                <?php
-                    echo "<span class=\"bold\">".format_string($category->name, true, $fmtoptions)."</span> <span>($num_entries " . get_string("entries","glossary") . ")</span>";
+                    echo "<span class=\"bold\">".format_string($category->name, true, $fmtoptions)."</span> <span>($num_entries " . get_string("entries", "glossary") . ")</span>";
                ?>
                </td>
                <td style="width:19%" align="center" class="action">
                <?php
-                echo "<a href=\"editcategories.php?id=$cm->id&amp;action=delete&amp;mode=cat&amp;hook=$category->id\"><img  alt=\"" . get_string("delete") . "\"src=\"" . $OUTPUT->pix_url('t/delete') . "\" class=\"iconsmall\" /></a> ";
-                echo "<a href=\"editcategories.php?id=$cm->id&amp;action=edit&amp;mode=cat&amp;hook=$category->id\"><img  alt=\"" . get_string("edit") . "\" src=\"" . $OUTPUT->pix_url('t/edit') . "\" class=\"iconsmall\" /></a>";
+                echo "<a href=\"editcategories.php?id=$cm->id&amp;action=delete&amp;mode=cat&amp;hook=$category->id\"><img  alt=\"" .
+                     get_string("delete") . "\"src=\"" . $OUTPUT->pix_url('t/delete') . "\" class=\"iconsmall\" /></a> ";
+                echo "<a href=\"editcategories.php?id=$cm->id&amp;action=edit&amp;mode=cat&amp;hook=$category->id\"><img  alt=\"" .
+                     get_string("edit") . "\" src=\"" . $OUTPUT->pix_url('t/edit') . "\" class=\"iconsmall\" /></a>";
                ?>
                </td>
              </tr>
 
              <?php
 
-          }
+        }
         echo '</table>';
-     }
+    }
 ?>
 
         </td></tr>
@@ -255,12 +276,12 @@ if ( $action ) {
              $options['action'] = "add";
 
              echo "<table class=\"editbuttons\" border=\"0\"><tr><td align=\"$rightalignment\">";
-             echo $OUTPUT->single_button(new moodle_url("editcategories.php", $options), get_string("add") . " " . get_string("category","glossary"));
+             echo $OUTPUT->single_button(new moodle_url("editcategories.php", $options), get_string("add") . " " . get_string("category", "glossary"));
              echo "</td><td align=\"$leftalignment\">";
              unset($options['action']);
              $options['mode'] = 'cat';
              $options['hook'] = $hook;
-             echo $OUTPUT->single_button(new moodle_url("view.php", $options), get_string("back","glossary"));
+             echo $OUTPUT->single_button(new moodle_url("view.php", $options), get_string("back", "glossary"));
              echo "</td></tr>";
              echo "</table>";
 

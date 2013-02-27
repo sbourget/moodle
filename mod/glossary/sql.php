@@ -1,72 +1,88 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * SQL.PHP
- *    This file is include from view.php and print.php
- * @copyright 2003
- **/
+ * This file is include from view.php and print.php 
+ *
+ * @package    mod_glossary
+ * @copyright  2003 onwards Williams Castillo (castillow@tutopia.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
-/// Creating the SQL statements
+// Creating the SQL statements.
 
-/// Initialise some variables
-    $sqlorderby = '';
-    $sqlsortkey = NULL;
+// Initialise some variables.
+$sqlorderby = '';
+$sqlsortkey = null;
 
-    // For cases needing inner view
-    $sqlwrapheader = '';
-    $sqlwrapfooter = '';
+// For cases needing inner view.
+$sqlwrapheader = '';
+$sqlwrapfooter = '';
 
-/// Calculate the SQL sortkey to be used by the SQL statements later
-    switch ( $sortkey ) {
-        case "CREATION":
-            $sqlsortkey = "timecreated";
-            break;
-        case "UPDATE":
-            $sqlsortkey = "timemodified";
-            break;
-        case "FIRSTNAME":
-            $sqlsortkey = "firstname";
-            break;
-        case "LASTNAME":
-            $sqlsortkey = "lastname";
-            break;
-    }
-    $sqlsortorder = $sortorder;
+// Calculate the SQL sortkey to be used by the SQL statements later.
+switch ( $sortkey ) {
+    case "CREATION":
+        $sqlsortkey = "timecreated";
+        break;
+    case "UPDATE":
+        $sqlsortkey = "timemodified";
+        break;
+    case "FIRSTNAME":
+        $sqlsortkey = "firstname";
+        break;
+    case "LASTNAME":
+        $sqlsortkey = "lastname";
+        break;
+}
+$sqlsortorder = $sortorder;
 
-/// Pivot is the field that set the break by groups (category, initial, author name, etc)
+// Pivot is the field that set the break by groups (category, initial, author name, etc).
 
-/// fullpivot indicate if the whole pivot should be compared agasint the db or just the first letter
-/// printpivot indicate if the pivot should be printed or not
+// Fullpivot indicate if the whole pivot should be compared agasint the db or just the first letter.
+// Printpivot indicate if the pivot should be printed or not.
 
-    $fullpivot = 1;
-    $params = array('gid1'=>$glossary->id, 'gid2'=>$glossary->id, 'myid'=>$USER->id, 'hook'=>$hook);
+$fullpivot = 1;
+$params = array('gid1'=>$glossary->id, 'gid2'=>$glossary->id, 'myid'=>$USER->id, 'hook'=>$hook);
 
-    $userid = '';
-    if ( isloggedin() ) {
-        $userid = "OR ge.userid = :myid";
-    }
-    switch ($tab) {
+$userid = '';
+if ( isloggedin() ) {
+    $userid = "OR ge.userid = :myid";
+}
+switch ($tab) {
     case GLOSSARY_CATEGORY_VIEW:
         if ($hook == GLOSSARY_SHOW_ALL_CATEGORIES  ) {
 
             $sqlselect = "SELECT gec.id AS cid, ge.*, gec.entryid, gc.name AS glossarypivot";
             $sqlfrom   = "FROM {glossary_entries} ge,
-                               {glossary_entries_categories} gec,
-                               {glossary_categories} gc";
+                                {glossary_entries_categories} gec,
+                                {glossary_categories} gc";
             $sqlwhere  = "WHERE (ge.glossaryid = :gid1 OR ge.sourceglossaryid = :gid2) AND
-                          ge.id = gec.entryid AND gc.id = gec.categoryid AND
-                          (ge.approved <> 0 $userid)";
+                            ge.id = gec.entryid AND gc.id = gec.categoryid AND
+                            (ge.approved <> 0 $userid)";
 
             $sqlorderby = ' ORDER BY gc.name, ge.concept';
 
-        } elseif ($hook == GLOSSARY_SHOW_NOT_CATEGORISED ) {
+        } else if ($hook == GLOSSARY_SHOW_NOT_CATEGORISED ) {
 
             $printpivot = 0;
             $sqlselect = "SELECT ge.*, concept AS glossarypivot";
             $sqlfrom   = "FROM {glossary_entries} ge LEFT JOIN {glossary_entries_categories} gec
-                               ON ge.id = gec.entryid";
+                                ON ge.id = gec.entryid";
             $sqlwhere  = "WHERE (glossaryid = :gid1 OR sourceglossaryid = :gid2) AND
-                          (ge.approved <> 0 $userid) AND gec.entryid IS NULL";
+                            (ge.approved <> 0 $userid) AND gec.entryid IS NULL";
 
 
             $sqlorderby = ' ORDER BY concept';
@@ -77,9 +93,9 @@
             $sqlselect  = "SELECT ge.*, ce.entryid, c.name AS glossarypivot";
             $sqlfrom    = "FROM {glossary_entries} ge, {glossary_entries_categories} ce, {glossary_categories} c";
             $sqlwhere   = "WHERE ge.id = ce.entryid AND ce.categoryid = :hook AND
-                                 ce.categoryid = c.id AND ge.approved != 0 AND
-                                 (ge.glossaryid = :gid1 OR ge.sourceglossaryid = :gid2) AND
-                          (ge.approved <> 0 $userid)";
+                                    ce.categoryid = c.id AND ge.approved != 0 AND
+                                    (ge.glossaryid = :gid1 OR ge.sourceglossaryid = :gid2) AND
+                            (ge.approved <> 0 $userid)";
 
             $sqlorderby = ' ORDER BY c.name, ge.concept';
 
@@ -104,9 +120,9 @@
         $sqlselect  = "SELECT ge.*, $usernamefield AS glossarypivot, 1 AS userispivot ";
         $sqlfrom    = "FROM {glossary_entries} ge, {user} u";
         $sqlwhere   = "WHERE ge.userid = u.id  AND
-                             (ge.approved <> 0 $userid)
-                             $where AND
-                             (ge.glossaryid = :gid1 OR ge.sourceglossaryid = :gid2)";
+                                (ge.approved <> 0 $userid)
+                                $where AND
+                                (ge.glossaryid = :gid1 OR ge.sourceglossaryid = :gid2)";
         $sqlorderby = "ORDER BY $usernamefield $sqlsortorder, ge.concept";
     break;
     case GLOSSARY_APPROVAL_VIEW:
@@ -123,7 +139,7 @@
         $sqlselect  = "SELECT ge.*, ge.concept AS glossarypivot";
         $sqlfrom    = "FROM {glossary_entries} ge";
         $sqlwhere   = "WHERE (ge.glossaryid = :gid1 OR ge.sourceglossaryid = :gid2) AND
-                             ge.approved = 0 $where";
+                                ge.approved = 0 $where";
 
         if ( $sqlsortkey ) {
             $sqlorderby = "ORDER BY $sqlsortkey $sqlsortorder";
@@ -142,135 +158,132 @@
         $fullpivot = 0;
 
         switch ( $mode ) {
-        case 'search':
+            case 'search':
 
-            if ($DB->sql_regex_supported()) {
-                $REGEXP    = $DB->sql_regex(true);
-                $NOTREGEXP = $DB->sql_regex(false);
-            }
-
-            $searchcond = array();
-            $alcond     = array();
-            //$params     = array();
-            $i = 0;
-
-            $concat = $DB->sql_concat('ge.concept', "' '", 'ge.definition',"' '", "COALESCE(al.alias, '')");
-
-            $searchterms = explode(" ",$hook);
-
-            foreach ($searchterms as $searchterm) {
-                $i++;
-
-                $NOT = false; /// Initially we aren't going to perform NOT LIKE searches, only MSSQL and Oracle
-                           /// will use it to simulate the "-" operator with LIKE clause
-
-            /// Under Oracle and MSSQL, trim the + and - operators and perform
-            /// simpler LIKE (or NOT LIKE) queries
-                if (!$DB->sql_regex_supported()) {
-                    if (substr($searchterm, 0, 1) == '-') {
-                        $NOT = true;
-                    }
-                    $searchterm = trim($searchterm, '+-');
+                if ($DB->sql_regex_supported()) {
+                    $REGEXP    = $DB->sql_regex(true);
+                    $NOTREGEXP = $DB->sql_regex(false);
                 }
 
-                if (substr($searchterm,0,1) == '+') {
-                    $searchterm = trim($searchterm, '+-');
-                    if (textlib::strlen($searchterm) < 2) {
-                        continue;
-                    }
-                    $searchterm = preg_quote($searchterm, '|');
-                    $searchcond[] = "$concat $REGEXP :ss$i";
-                    $params['ss'.$i] = "(^|[^a-zA-Z0-9])$searchterm([^a-zA-Z0-9]|$)";
+                $searchcond = array();
+                $alcond     = array();
+                $i = 0;
 
-                } else if (substr($searchterm,0,1) == "-") {
-                    $searchterm = trim($searchterm, '+-');
-                    if (textlib::strlen($searchterm) < 2) {
-                        continue;
+                $concat = $DB->sql_concat('ge.concept', "' '", 'ge.definition', "' '", "COALESCE(al.alias, '')");
+
+                $searchterms = explode(" ", $hook);
+
+                foreach ($searchterms as $searchterm) {
+                    $i++;
+
+                    $NOT = false; // Initially we aren't going to perform NOT LIKE searches, only MSSQL and Oracle.
+                                  // will use it to simulate the "-" operator with LIKE clause
+                                  // Under Oracle and MSSQL, trim the + and - operators and perform
+                                  // simpler LIKE (or NOT LIKE) queries.
+                    if (!$DB->sql_regex_supported()) {
+                        if (substr($searchterm, 0, 1) == '-') {
+                            $NOT = true;
+                        }
+                        $searchterm = trim($searchterm, '+-');
                     }
-                    $searchterm = preg_quote($searchterm, '|');
-                    $searchcond[] = "$concat $NOTREGEXP :ss$i";
-                    $params['ss'.$i] = "(^|[^a-zA-Z0-9])$searchterm([^a-zA-Z0-9]|$)";
+
+                    if (substr($searchterm, 0, 1) == '+') {
+                        $searchterm = trim($searchterm, '+-');
+                        if (textlib::strlen($searchterm) < 2) {
+                            continue;
+                        }
+                        $searchterm = preg_quote($searchterm, '|');
+                        $searchcond[] = "$concat $REGEXP :ss$i";
+                        $params['ss'.$i] = "(^|[^a-zA-Z0-9])$searchterm([^a-zA-Z0-9]|$)";
+
+                    } else if (substr($searchterm, 0, 1) == "-") {
+                        $searchterm = trim($searchterm, '+-');
+                        if (textlib::strlen($searchterm) < 2) {
+                            continue;
+                        }
+                        $searchterm = preg_quote($searchterm, '|');
+                        $searchcond[] = "$concat $NOTREGEXP :ss$i";
+                        $params['ss'.$i] = "(^|[^a-zA-Z0-9])$searchterm([^a-zA-Z0-9]|$)";
+
+                    } else {
+                        if (textlib::strlen($searchterm) < 2) {
+                            continue;
+                        }
+                        $searchcond[] = $DB->sql_like($concat, ":ss$i", false, true, $NOT);
+                        $params['ss'.$i] = "%$searchterm%";
+                    }
+                }
+
+                if (empty($searchcond)) {
+                    $where = "AND 1=2 "; // No search result.
 
                 } else {
-                    if (textlib::strlen($searchterm) < 2) {
-                        continue;
-                    }
-                    $searchcond[] = $DB->sql_like($concat, ":ss$i", false, true, $NOT);
-                    $params['ss'.$i] = "%$searchterm%";
+                    $searchcond = implode(" AND ", $searchcond);
+
+                    // Need one inner view here to avoid distinct + text.
+                    $sqlwrapheader = 'SELECT ge.*, ge.concept AS glossarypivot
+                                        FROM {glossary_entries} ge
+                                        JOIN ( ';
+                    $sqlwrapfooter = ' ) gei ON (ge.id = gei.id)';
+
+                    $sqlselect  = "SELECT DISTINCT ge.id";
+                    $sqlfrom    = "FROM {glossary_entries} ge
+                                    LEFT JOIN {glossary_alias} al ON al.entryid = ge.id";
+                    $where      = "AND ($searchcond)";
                 }
-            }
 
-            if (empty($searchcond)) {
-                $where = "AND 1=2 "; // no search result
+            break;
 
-            } else {
-                $searchcond = implode(" AND ", $searchcond);
+            case 'term':
+                $params['hook2'] = $hook;
+                $printpivot = 0;
+                $sqlfrom .= " LEFT JOIN {glossary_alias} ga on ge.id = ga.entryid";
+                $where = "AND (ge.concept = :hook OR ga.alias = :hook2) ";
+            break;
 
-                // Need one inner view here to avoid distinct + text
-                $sqlwrapheader = 'SELECT ge.*, ge.concept AS glossarypivot
-                                    FROM {glossary_entries} ge
-                                    JOIN ( ';
-                $sqlwrapfooter = ' ) gei ON (ge.id = gei.id)';
+            case 'entry':
+                $printpivot = 0;
+                $where = "AND ge.id = :hook";
+            break;
 
-                $sqlselect  = "SELECT DISTINCT ge.id";
-                $sqlfrom    = "FROM {glossary_entries} ge
-                               LEFT JOIN {glossary_alias} al ON al.entryid = ge.id";
-                $where      = "AND ($searchcond)";
-            }
-
-        break;
-
-        case 'term':
-            $params['hook2'] = $hook;
-            $printpivot = 0;
-            $sqlfrom .= " LEFT JOIN {glossary_alias} ga on ge.id = ga.entryid";
-            $where = "AND (ge.concept = :hook OR ga.alias = :hook2) ";
-        break;
-
-        case 'entry':
-            $printpivot = 0;
-            $where = "AND ge.id = :hook";
-        break;
-
-        case 'letter':
-            if ($hook != 'ALL' and $hook != 'SPECIAL') {
-                $params['hookup'] = textlib::strtoupper($hook);
-                $where = "AND " . $DB->sql_substr("upper(concept)", 1, textlib::strlen($hook)) . " = :hookup";
-            }
-            if ($hook == 'SPECIAL') {
-                //Create appropiate IN contents
-                $alphabet = explode(",", get_string('alphabet', 'langconfig'));
-                list($nia, $aparams) = $DB->get_in_or_equal($alphabet, SQL_PARAMS_NAMED, $start='a', false);
-                $params = array_merge($params, $aparams);
-                $where = "AND " . $DB->sql_substr("upper(concept)", 1, 1) . " $nia";
-            }
-        break;
+            case 'letter':
+                if ($hook != 'ALL' and $hook != 'SPECIAL') {
+                    $params['hookup'] = textlib::strtoupper($hook);
+                    $where = "AND " . $DB->sql_substr("upper(concept)", 1, textlib::strlen($hook)) . " = :hookup";
+                }
+                if ($hook == 'SPECIAL') {
+                    // Create appropiate IN contents.
+                    $alphabet = explode(",", get_string('alphabet', 'langconfig'));
+                    list($nia, $aparams) = $DB->get_in_or_equal($alphabet, SQL_PARAMS_NAMED, $start='a', false);
+                    $params = array_merge($params, $aparams);
+                    $where = "AND " . $DB->sql_substr("upper(concept)", 1, 1) . " $nia";
+                }
+            break;
         }
 
         $sqlwhere   = "WHERE (ge.glossaryid = :gid1 or ge.sourceglossaryid = :gid2) AND
-                             (ge.approved <> 0 $userid)
-                              $where";
+                                (ge.approved <> 0 $userid)
+                                $where";
         switch ( $tab ) {
-        case GLOSSARY_DATE_VIEW:
-            $sqlorderby = "ORDER BY $sqlsortkey $sqlsortorder";
-        break;
+            case GLOSSARY_DATE_VIEW:
+                $sqlorderby = "ORDER BY $sqlsortkey $sqlsortorder";
+            break;
 
-        case GLOSSARY_STANDARD_VIEW:
-            $sqlorderby = "ORDER BY ge.concept";
-        default:
-        break;
+            case GLOSSARY_STANDARD_VIEW:
+                $sqlorderby = "ORDER BY ge.concept";
+            default:
+            break;
         }
     break;
-    }
-    $count = $DB->count_records_sql("SELECT COUNT(DISTINCT(ge.id)) $sqlfrom $sqlwhere", $params);
+}
+$count = $DB->count_records_sql("SELECT COUNT(DISTINCT(ge.id)) $sqlfrom $sqlwhere", $params);
 
-    $limitfrom = $offset;
-    $limitnum = 0;
+$limitfrom = $offset;
+$limitnum = 0;
 
-    if ( $offset >= 0 ) {
-        $limitnum = $entriesbypage;
-    }
+if ( $offset >= 0 ) {
+    $limitnum = $entriesbypage;
+}
 
-    $query = "$sqlwrapheader $sqlselect $sqlfrom $sqlwhere $sqlwrapfooter $sqlorderby";
-    $allentries = $DB->get_records_sql($query, $params, $limitfrom, $limitnum);
-
+$query = "$sqlwrapheader $sqlselect $sqlfrom $sqlwhere $sqlwrapfooter $sqlorderby";
+$allentries = $DB->get_records_sql($query, $params, $limitfrom, $limitnum);

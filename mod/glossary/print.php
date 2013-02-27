@@ -1,18 +1,41 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Glossary printer friendly view
+ *
+ * @package    mod_glossary
+ * @copyright  2003 onwards Williams Castillo (castillow@tutopia.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 
 global $CFG;
 
 require_once("../../config.php");
 require_once("lib.php");
 
-$id            = required_param('id', PARAM_INT);                     // Course Module ID
-$sortorder     = optional_param('sortorder', 'asc', PARAM_ALPHA);     // Sorting order
-$offset        = optional_param('offset', 0, PARAM_INT);              // number of entries to bypass
-$displayformat = optional_param('displayformat',-1, PARAM_INT);
+$id            = required_param('id', PARAM_INT);                     // Course Module ID.
+$sortorder     = optional_param('sortorder', 'asc', PARAM_ALPHA);     // Sorting order.
+$offset        = optional_param('offset', 0, PARAM_INT);              // Number of entries to bypass.
+$displayformat = optional_param('displayformat', -1, PARAM_INT);
 
-$mode    = required_param('mode', PARAM_ALPHA);             // mode to show the entries
-$hook    = optional_param('hook','ALL', PARAM_CLEAN);       // what to show
-$sortkey = optional_param('sortkey','UPDATE', PARAM_ALPHA); // Sorting key
+$mode    = required_param('mode', PARAM_ALPHA);              // Mode to show the entries.
+$hook    = optional_param('hook', 'ALL', PARAM_CLEAN);       // What to show.
+$sortkey = optional_param('sortkey', 'UPDATE', PARAM_ALPHA); // Sorting key.
 
 $url = new moodle_url('/mod/glossary/print.php', array('id'=>$id));
 if ($sortorder !== 'asc') {
@@ -54,7 +77,7 @@ if ( !$entriesbypage = $glossary->entbypage ) {
 require_course_login($course, true, $cm);
 $context = context_module::instance($cm->id);
 
-// Prepare format_string/text options
+// Prepare format_string/text options.
 $fmtoptions = array(
     'context' => $context);
 
@@ -67,8 +90,8 @@ if (!has_capability('mod/glossary:manageentries', $context) and !$glossary->allo
     notice(get_string('printviewnotallowed', 'glossary'));
 }
 
-/// setting the default values for the display mode of the current glossary
-/// only if the glossary is viewed by the first time
+// Setting the default values for the display mode of the current glossary
+// only if the glossary is viewed by the first time.
 if ( $dp = $DB->get_record('glossary_formats', array('name'=>$glossary->displayformat)) ) {
     $printpivot = $dp->showgroup;
     if ( $mode == '' and $hook == '' and $show == '') {
@@ -89,7 +112,7 @@ if ( $displayformat == -1 ) {
      $displayformat = $glossary->displayformat;
 }
 
-/// stablishing flag variables
+// Establishing flag variables.
 if ( $sortorder = strtolower($sortorder) ) {
     if ($sortorder != 'asc' and $sortorder != 'desc') {
         $sortorder = '';
@@ -106,58 +129,58 @@ if ( $sortkey = strtoupper($sortkey) ) {
 }
 
 switch ( $mode = strtolower($mode) ) {
-case 'entry':  /// Looking for a certain entry id
-    $tab = GLOSSARY_STANDARD_VIEW;
-break;
+    case 'entry':  // Looking for a certain entry id.
+        $tab = GLOSSARY_STANDARD_VIEW;
+    break;
 
-case 'cat':    /// Looking for a certain cat
-    $tab = GLOSSARY_CATEGORY_VIEW;
-    if ( $hook > 0 ) {
-        $category = $DB->get_record("glossary_categories", array("id"=>$hook));
-    }
-break;
+    case 'cat':    // Looking for a certain cat.
+        $tab = GLOSSARY_CATEGORY_VIEW;
+        if ( $hook > 0 ) {
+            $category = $DB->get_record("glossary_categories", array("id"=>$hook));
+        }
+    break;
 
-case 'approval':    /// Looking for entries waiting for approval
-    $tab = GLOSSARY_APPROVAL_VIEW;
-    if ( !$hook and !$sortkey and !$sortorder) {
-        $hook = 'ALL';
-    }
-break;
+    case 'approval':    // Looking for entries waiting for approval.
+        $tab = GLOSSARY_APPROVAL_VIEW;
+        if ( !$hook and !$sortkey and !$sortorder) {
+            $hook = 'ALL';
+        }
+    break;
 
-case 'term':   /// Looking for entries that include certain term in its concept, definition or aliases
-    $tab = GLOSSARY_STANDARD_VIEW;
-break;
+    case 'term':   // Looking for entries that include certain term in its concept, definition or aliases.
+        $tab = GLOSSARY_STANDARD_VIEW;
+    break;
 
-case 'date':
-    $tab = GLOSSARY_DATE_VIEW;
-    if ( !$sortkey ) {
-        $sortkey = 'UPDATE';
-    }
-    if ( !$sortorder ) {
-        $sortorder = 'desc';
-    }
-break;
+    case 'date':
+        $tab = GLOSSARY_DATE_VIEW;
+        if ( !$sortkey ) {
+            $sortkey = 'UPDATE';
+        }
+        if ( !$sortorder ) {
+            $sortorder = 'desc';
+        }
+    break;
 
-case 'author':  /// Looking for entries, browsed by author
-    $tab = GLOSSARY_AUTHOR_VIEW;
-    if ( !$hook ) {
-        $hook = 'ALL';
-    }
-    if ( !$sortkey ) {
-        $sortkey = 'FIRSTNAME';
-    }
-    if ( !$sortorder ) {
-        $sortorder = 'asc';
-    }
-break;
+    case 'author':  // Looking for entries, browsed by author.
+        $tab = GLOSSARY_AUTHOR_VIEW;
+        if ( !$hook ) {
+            $hook = 'ALL';
+        }
+        if ( !$sortkey ) {
+            $sortkey = 'FIRSTNAME';
+        }
+        if ( !$sortorder ) {
+            $sortorder = 'asc';
+        }
+    break;
 
-case 'letter':  /// Looking for entries that begin with a certain letter, ALL or SPECIAL characters
-default:
-    $tab = GLOSSARY_STANDARD_VIEW;
-    if ( !$hook ) {
-        $hook = 'ALL';
-    }
-break;
+    case 'letter':  // Looking for entries that begin with a certain letter, ALL or SPECIAL characters.
+    default:
+        $tab = GLOSSARY_STANDARD_VIEW;
+        if ( !$hook ) {
+            $hook = 'ALL';
+        }
+    break;
 }
 
 include_once("sql.php");
@@ -169,34 +192,34 @@ $site = $DB->get_record("course", array("id"=>1));
 echo '<p style="text-align:right"><span style="font-size:0.75em">' . userdate(time()) . '</span></p>';
 echo get_string("site") . ': <strong>' . format_string($site->fullname) . '</strong><br />';
 echo get_string("course") . ': <strong>' . format_string($course->fullname) . ' ('. format_string($course->shortname) . ')</strong><br />';
-echo get_string("modulename","glossary") . ': <strong>' . format_string($glossary->name, true) . '</strong>';
+echo get_string("modulename", "glossary") . ': <strong>' . format_string($glossary->name, true) . '</strong>';
 if ( $allentries ) {
     foreach ($allentries as $entry) {
 
-        // Setting the pivot for the current entry
+        // Setting the pivot for the current entry.
         $pivot = $entry->glossarypivot;
         $upperpivot = textlib::strtoupper($pivot);
         $pivottoshow = textlib::strtoupper(format_string($pivot, true, $fmtoptions));
-        // Reduce pivot to 1cc if necessary
+        // Reduce pivot to 1cc if necessary.
         if ( !$fullpivot ) {
             $upperpivot = textlib::substr($upperpivot, 0, 1);
             $pivottoshow = textlib::substr($pivottoshow, 0, 1);
         }
 
-        // If there's  group break
+        // If there's  group break.
         if ( $currentpivot != $upperpivot ) {
 
-            // print the group break if apply
-            if ( $printpivot )  {
+            // Print the group break if apply.
+            if ( $printpivot ) {
                 $currentpivot = $upperpivot;
 
                 if ( isset($entry->userispivot) ) {
-                    // printing the user icon if defined (only when browsing authors)
+                    // Printing the user icon if defined (only when browsing authors).
                     $user = $DB->get_record("user", array("id"=>$entry->userid));
                     $pivottoshow = fullname($user);
                 }
 
-                echo "<p class='mdl-align'><strong>".clean_text($pivottoshow)."</strong></p>" ;
+                echo "<p class='mdl-align'><strong>".clean_text($pivottoshow)."</strong></p>";
             }
         }
 

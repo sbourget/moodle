@@ -1,9 +1,32 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Glossary module edit form
+ *
+ * @package    mod_glossary
+ * @copyright  2006 onwards Jamie Pratt
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+    die('Direct access to this script is forbidden.');    // It must be included from a Moodle page.
 }
 
-require_once ($CFG->dirroot.'/lib/formslib.php');
+require_once($CFG->dirroot.'/lib/formslib.php');
 
 class mod_glossary_entry_form extends moodleform {
 
@@ -19,11 +42,11 @@ class mod_glossary_entry_form extends moodleform {
         $attachmentoptions = $this->_customdata['attachmentoptions'];
 
         $context  = context_module::instance($cm->id);
-        // Prepare format_string/text options
+        // Prepare format_string/text options.
         $fmtoptions = array(
             'context' => $context);
 
-//-------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         $mform->addElement('text', 'concept', get_string('concept', 'glossary'));
@@ -34,7 +57,7 @@ class mod_glossary_entry_form extends moodleform {
         $mform->setType('definition_editor', PARAM_RAW);
         $mform->addRule('definition_editor', get_string('required'), 'required', null, 'client');
 
-        if ($categories = $DB->get_records_menu('glossary_categories', array('glossaryid'=>$glossary->id), 'name ASC', 'id, name')){
+        if ($categories = $DB->get_records_menu('glossary_categories', array('glossaryid'=>$glossary->id), 'name ASC', 'id, name')) {
             foreach ($categories as $id => $name) {
                 $categories[$id] = format_string($name, true, $fmtoptions);
             }
@@ -60,7 +83,7 @@ class mod_glossary_entry_form extends moodleform {
             $mform->setType('fullmatch', PARAM_INT);
 
         } else {
-//-------------------------------------------------------------------------------
+            // -------------------------------------------------------------------------------
             $mform->addElement('header', 'linkinghdr', get_string('linking', 'glossary'));
 
             $mform->addElement('checkbox', 'usedynalink', get_string('entryusedynalink', 'glossary'));
@@ -83,10 +106,10 @@ class mod_glossary_entry_form extends moodleform {
         $mform->addElement('hidden', 'cmid');
         $mform->setType('cmid', PARAM_INT);
 
-//-------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------
         $this->add_action_buttons();
 
-//-------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------
         $this->set_data($currententry);
     }
 
@@ -102,15 +125,15 @@ class mod_glossary_entry_form extends moodleform {
         $data['concept'] = trim($data['concept']);
 
         if ($id) {
-            //We are updating an entry, so we compare current session user with
-            //existing entry user to avoid some potential problems if secureforms=off
-            //Perhaps too much security? Anyway thanks to skodak (Bug 1823)
+            // We are updating an entry, so we compare current session user with
+            // existing entry user to avoid some potential problems if secureforms=off
+            // Perhaps too much security? Anyway thanks to skodak (Bug 1823).
             $old = $DB->get_record('glossary_entries', array('id'=>$id));
             $ineditperiod = ((time() - $old->timecreated <  $CFG->maxeditingtime) || $glossary->editalways);
             if ((!$ineditperiod || $USER->id != $old->userid) and !has_capability('mod/glossary:manageentries', $context)) {
                 if ($USER->id != $old->userid) {
                     $errors['concept'] = get_string('errcannoteditothers', 'glossary');
-                } elseif (!$ineditperiod) {
+                } else if (!$ineditperiod) {
                     $errors['concept'] = get_string('erredittimeexpired', 'glossary');
                 }
             }
@@ -138,4 +161,3 @@ class mod_glossary_entry_form extends moodleform {
         return $errors;
     }
 }
-
