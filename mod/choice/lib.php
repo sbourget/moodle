@@ -137,6 +137,9 @@ function choice_add_instance($choice) {
         }
     }
 
+    // Add calendar events if necessary.
+    choice_set_events($choice);
+
     return $choice->id;
 }
 
@@ -185,7 +188,61 @@ function choice_update_instance($choice) {
         }
     }
 
+    // Add calendar events if necessary.
+    choice_set_events($choice);
+
     return $DB->update_record('choice', $choice);
+
+}
+
+/**
+ * This creates new calendar events given as timeopen and timeclose by $choice.
+ *
+ * @param stdClass $choice
+ * @return void
+ */
+function choice_set_events($choice) {
+    global $DB;
+    // Remove old calendar events.
+    $DB->delete_records('event', array('modulename' => 'choice', 'instance' => $choice->id));
+
+    // Add a calendar event if the choice has a start date.
+    if ($choice->timeopen > 0) {
+        $event = new stdClass();
+        $event->name        = get_string('calendarstart', 'choice', $choice->name);
+        $event->description = format_module_intro('choice', $choice, $choice->coursemodule);
+        $event->courseid    = $choice->course;
+        $event->groupid     = 0;
+        $event->userid      = 0;
+        $event->modulename  = 'choice';
+        $event->instance    = $choice->id;
+        $event->eventtype   = 'open';
+        $event->timestart   = $choice->timeopen;
+        $event->visible      = instance_is_visible('choice', $choice);
+        if ($choice->timeclose > 0) {
+            $event->timeduration = ($choice->timeclose - $choice->timeopen);
+        } else {
+            $event->timeduration = 0;
+        }
+        calendar_event::create($event);
+    }
+
+    // Add a calendar event if the choice has an end date.
+    if ($choice->timeclose > 0) {
+        $event = new stdClass();
+        $event->name         = get_string('calendarend', 'choice', $choice->name);
+        $event->description = format_module_intro('choice', $choice, $choice->coursemodule);
+        $event->courseid    = $choice->course;
+        $event->groupid     = 0;
+        $event->userid      = 0;
+        $event->modulename  = 'choice';
+        $event->instance    = $choice->id;
+        $event->eventtype   = 'close';
+        $event->timestart    = $choice->timeclose;
+        $event->visible      = instance_is_visible('choice', $choice);
+        $event->timeduration = 0;
+        calendar_event::create($event);
+    }
 
 }
 
@@ -590,6 +647,10 @@ function choice_delete_instance($id) {
     }
 
     if (! $DB->delete_records("choice", array("id"=>"$choice->id"))) {
+        $result = false;
+    }
+    // Remove old calendar events.
+    if (! $DB->delete_records('event', array('modulename' => 'choice', 'instance' => $choice->id))) {
         $result = false;
     }
 
