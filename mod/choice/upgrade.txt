@@ -1,6 +1,10 @@
 This files describes API changes in /mod/choice/*,
 information provided here is intended especially for developers.
 
+=== 3.2 ===
+* Added two new permissions mod/choice:view and mod/choice:viewpublishedresults to control access 
+  for both viewing the activity and viewing the results.
+
 === 3.0 ===
 
 * External function mod_choice_external::get_choices_by_courses returned parameter "name" and

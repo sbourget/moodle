@@ -80,6 +80,30 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         )
+    ),
+
+    'mod/choice:view' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+            'guest' => CAP_ALLOW,
+            'frontpage' => CAP_ALLOW
+        )
+    ),
+
+    'mod/choice:viewpublishedresults' => array(
+
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'student' => CAP_ALLOW,
+            'frontpage' => CAP_ALLOW,
+            'guest' => CAP_ALLOW
+        )
     )
 );
 

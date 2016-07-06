@@ -424,6 +424,8 @@ class mod_choice_external extends external_api {
         $context = context_module::instance($cm->id);
         self::validate_context($context);
 
+        require_capability('mod/choice:view', $context);
+
         // Trigger course_module_viewed event and completion.
         choice_view($choice, $course, $cm, $context);
 
