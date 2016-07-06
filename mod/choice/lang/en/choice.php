@@ -45,14 +45,14 @@ $string['havetologin'] = 'You have to log in before you can submit your choice';
 $string['choice'] = 'Choice';
 $string['choiceactivityname'] = 'Choice: {$a}';
 $string['choice:addinstance'] = 'Add a new choice';
-$string['choiceclose'] = 'Until';
+$string['choiceclose'] = 'Allow responses until';
 $string['choice:deleteresponses'] = 'Delete responses';
 $string['choice:downloadresponses'] = 'Download responses';
 $string['choicefull'] = 'This choice is full and there are no available places.';
 $string['choice:choose'] = 'Record a choice';
 $string['choicecloseson'] = 'Choice closes on {$a}';
 $string['choicename'] = 'Choice name';
-$string['choiceopen'] = 'Open';
+$string['choiceopen'] = 'Allow responses from';
 $string['choiceoptions'] = 'Choice options';
 $string['choiceoptions_help'] = 'Here is where you specify the options that participants have to choose from.
 
