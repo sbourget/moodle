@@ -25,8 +25,6 @@
 
 /** Include eventslib.php */
 require_once($CFG->libdir.'/eventslib.php');
-/** Include calendar/lib.php */
-require_once($CFG->dirroot.'/calendar/lib.php');
 // Include forms lib.
 require_once($CFG->libdir.'/formslib.php');
 
@@ -633,6 +631,12 @@ function feedback_reset_userdata($data) {
                         'error'=>false);
     }
 
+    // Updating dates - shift may be negative too.
+    if ($data->timeshift) {
+        shift_course_mod_dates('feedback', array('timeopen', 'timeclose'), $data->timeshift, $data->courseid);
+        $status[] = array('component' => $componentstr, 'item' => get_string('datechanged'), 'error' => false);
+    }
+
     return $status;
 }
 
@@ -731,55 +735,117 @@ function feedback_get_editor_options() {
  * @return void
  */
 function feedback_set_events($feedback) {
-    global $DB;
+    global $DB, $CFG;
 
-    // adding the feedback to the eventtable (I have seen this at quiz-module)
-    $DB->delete_records('event', array('modulename'=>'feedback', 'instance'=>$feedback->id));
+    // Include calendar/lib.php.
+    require_once($CFG->dirroot.'/calendar/lib.php');
 
+    // Get CMID if not sent as part of $feedback.
     if (!isset($feedback->coursemodule)) {
-        $cm = get_coursemodule_from_id('feedback', $feedback->id);
+        $cm = get_coursemodule_from_instance('feedback', $feedback->id, $feedback->course);
         $feedback->coursemodule = $cm->id;
     }
 
-    // the open-event
-    if ($feedback->timeopen > 0) {
-        $event = new stdClass();
-        $event->name         = get_string('start', 'feedback').' '.$feedback->name;
-        $event->description  = format_module_intro('feedback', $feedback, $feedback->coursemodule);
-        $event->courseid     = $feedback->course;
-        $event->groupid      = 0;
-        $event->userid       = 0;
-        $event->modulename   = 'feedback';
-        $event->instance     = $feedback->id;
-        $event->eventtype    = 'open';
-        $event->timestart    = $feedback->timeopen;
-        $event->visible      = instance_is_visible('feedback', $feedback);
-        if ($feedback->timeclose > 0) {
-            $event->timeduration = ($feedback->timeclose - $feedback->timeopen);
-        } else {
+    // Feedback start calendar events.
+    $event = new stdClass();
+    if ($event->id = $DB->get_field('event', 'id',
+            array('modulename' => 'feedback', 'instance' => $feedback->id, 'eventtype' => 'open'))) {
+        if ($feedback->timeopen > 0) {
+            // Calendar event exists so update it.
+            $event->name         = get_string('calendarstart', 'feedback', $feedback->name);
+            $event->description  = format_module_intro('feedback', $feedback, $feedback->coursemodule);
+            $event->timestart    = $feedback->timeopen;
+            $event->visible      = instance_is_visible('feedback', $feedback);
             $event->timeduration = 0;
+            $calendarevent = calendar_event::load($event->id);
+            $calendarevent->update($event);
+        } else {
+            // Calendar event is on longer needed.
+            $calendarevent = calendar_event::load($event->id);
+            $calendarevent->delete();
         }
-
-        calendar_event::create($event);
+    } else {
+        if ($feedback->timeopen > 0) {
+            // Event doesn't exist so create one.
+            $event->name         = get_string('calendarstart', 'feedback', $feedback->name);
+            $event->description  = format_module_intro('feedback', $feedback, $feedback->coursemodule);
+            $event->courseid     = $feedback->course;
+            $event->groupid      = 0;
+            $event->userid       = 0;
+            $event->modulename   = 'feedback';
+            $event->instance     = $feedback->id;
+            $event->eventtype    = 'open';
+            $event->timestart    = $feedback->timeopen;
+            $event->visible      = instance_is_visible('feedback', $feedback);
+            $event->timeduration = 0;
+            calendar_event::create($event);
+        }
     }
 
-    // the close-event
-    if ($feedback->timeclose > 0) {
-        $event = new stdClass();
-        $event->name         = get_string('stop', 'feedback').' '.$feedback->name;
-        $event->description  = format_module_intro('feedback', $feedback, $feedback->coursemodule);
-        $event->courseid     = $feedback->course;
-        $event->groupid      = 0;
-        $event->userid       = 0;
-        $event->modulename   = 'feedback';
-        $event->instance     = $feedback->id;
-        $event->eventtype    = 'close';
-        $event->timestart    = $feedback->timeclose;
-        $event->visible      = instance_is_visible('feedback', $feedback);
-        $event->timeduration = 0;
-
-        calendar_event::create($event);
+    // Feedback close calendar events.
+    $event = new stdClass();
+    if ($event->id = $DB->get_field('event', 'id',
+            array('modulename' => 'feedback', 'instance' => $feedback->id, 'eventtype' => 'close'))) {
+        if ($feedback->timeclose > 0) {
+            // Calendar event exists so update it.
+            $event->name         = get_string('calendarend', 'feedback', $feedback->name);
+            $event->description  = format_module_intro('feedback', $feedback, $feedback->coursemodule);
+            $event->timestart    = $feedback->timeclose;
+            $event->visible      = instance_is_visible('feedback', $feedback);
+            $event->timeduration = 0;
+            $calendarevent = calendar_event::load($event->id);
+            $calendarevent->update($event);
+        } else {
+            // Calendar event is on longer needed.
+            $calendarevent = calendar_event::load($event->id);
+            $calendarevent->delete();
+        }
+    } else {
+        if ($feedback->timeclose > 0) {
+            // Event doesn't exist so create one.
+            $event->name         = get_string('calendarend', 'feedback', $feedback->name);
+            $event->description  = format_module_intro('feedback', $feedback, $feedback->coursemodule);
+            $event->courseid     = $feedback->course;
+            $event->groupid      = 0;
+            $event->userid       = 0;
+            $event->modulename   = 'feedback';
+            $event->instance     = $feedback->id;
+            $event->eventtype    = 'close';
+            $event->timestart    = $feedback->timeclose;
+            $event->visible      = instance_is_visible('feedback', $feedback);
+            $event->timeduration = 0;
+            calendar_event::create($event);
+        }
     }
+}
+
+/**
+ * This standard function will check all instances of this module
+ * and make sure there are up-to-date events created for each of them.
+ * If courseid = 0, then every chat event in the site is checked, else
+ * only chat events belonging to the course specified are checked.
+ * This function is used, in its new format, by restore_refresh_events()
+ *
+ * @param int $courseid
+ * @return bool
+ */
+function feedback_refresh_events($courseid = 0) {
+    global $DB;
+
+    if ($courseid) {
+        if (! $feedbacks = $DB->get_records("feedback", array("course" => $courseid))) {
+            return true;
+        }
+    } else {
+        if (! $feedbacks = $DB->get_records("feedback")) {
+            return true;
+        }
+    }
+
+    foreach ($feedbacks as $feedback) {
+        feedback_set_events($feedback);
+    }
+    return true;
 }
 
 /**
