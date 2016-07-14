@@ -166,3 +166,12 @@ echo $OUTPUT->header();
 echo $OUTPUT->custom_block_region('content');
 
 echo $OUTPUT->footer();
+
+// Trigger dashboard has been viewed event.
+    $params = array(
+        'userid' => $USER->id,
+        'objectid' => $USER->id
+    );
+
+$event = \core\event\dashboard_viewed::create($params);
+$event->trigger();
