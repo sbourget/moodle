@@ -380,8 +380,25 @@ class report_log_table_log extends table_sql {
                 $params['action'] = '%'.$action.'%';
             }
         } else if (!empty($this->filterparams->action)) {
-            $sql = "crud = :crud";
-            $params['crud'] = $this->filterparams->action;
+            $firstletter = substr($this->filterparams->action, 0, 1);
+            if ($firstletter == '-') {
+                $actions = str_split($this->filterparams->action, 1);
+                $count = 0;
+                foreach ($actions as $act) {
+                    if ($act !== '-') {
+                        if (++$count > 1) {
+                            $sql .= " OR crud = :crud$count";
+                            $params["crud$count"] = $act;
+                        } else {
+                            $sql = "crud = :crud$count";
+                            $params["crud$count"] = $act;
+                        }
+                    }
+                }
+            } else {
+                $sql = "crud = :crud";
+                $params['crud'] = $this->filterparams->action;
+            }
         } else {
             // Add condition for all possible values of crud (to use db index).
             list($sql, $params) = $DB->get_in_or_equal(array('c', 'r', 'u', 'd'),
