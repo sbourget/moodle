@@ -87,6 +87,12 @@ if ($delete && has_capability('moodle/badges:configurecriteria', $context)) {
         $badge->criteria[$type]->delete();
     }
     $return->param('msg', 'criteriadeleted');
+
+    // Trigger event, badge criteria deleted.
+    $eventparams = array('userid' => $USER->id, 'objectid' => $badge->id, 'context' => $PAGE->context);
+    $event = \core\event\badge_criteria_deleted::create($eventparams);
+    $event->trigger();
+
     redirect($return);
 }
 

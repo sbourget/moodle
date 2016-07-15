@@ -103,6 +103,17 @@ if (!empty($addcourse)) {
     }
     $criteria->save((array)$data);
     $return->param('msg', $msg);
+
+    // Trigger Events.
+    $eventparams = array('userid' => $USER->id, 'objectid' => $badge->id, 'context' => $PAGE->context);
+
+    if ($msg == 'criteriacreated') {
+        $event = \core\event\badge_criteria_added::create($eventparams);
+        $event->trigger();
+    } else if ($msg == 'criteriaupdated') {
+        $event = \core\event\badge_criteria_updated::create($eventparams);
+        $event->trigger();
+    }
     redirect($return);
 }
 

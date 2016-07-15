@@ -55,4 +55,265 @@ class core_badges_events_testcase extends core_badges_badgeslib_testcase {
 
         $sink->close();
     }
+
+    /**
+     * Test the badge created event.
+     *
+     * There is no external API for creating a badge, so the unit test will simply
+     * create and trigger the event and ensure data is returned as expected.
+     */
+    public function test_badge_created() {
+
+        $badge = new badge($this->badgeid);
+        // Trigger an event: badge created.
+        $eventparams = array(
+            'userid' => $badge->usercreated,
+            'objectid' => $badge->id,
+            'context' => $badge->get_context(),
+        );
+
+        $event = \core\event\badge_created::create($eventparams);
+        // Trigger and capture the event.
+        $sink = $this->redirectEvents();
+        $event->trigger();
+        $events = $sink->get_events();
+        $event = reset($events);
+
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\core\event\badge_created', $event);
+        $this->assertEquals($badge->usercreated, $event->userid);
+        $this->assertEquals($badge->id, $event->objectid);
+        $this->assertDebuggingNotCalled();
+        $sink->close();
+
+    }
+
+    /**
+     * Test the badge archived event.
+     *
+     */
+    public function test_badge_archived() {
+        $badge = new badge($this->badgeid);
+        $sink = $this->redirectEvents();
+
+        // Trigger and capture the event.
+        $badge->delete(true);
+        $events = $sink->get_events();
+        $this->assertCount(2, $events);
+        $event = $events[1];
+
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\core\event\badge_archived', $event);
+        $this->assertEquals($badge->id, $event->objectid);
+        $this->assertDebuggingNotCalled();
+        $sink->close();
+
+    }
+
+
+    /**
+     * Test the badge updated event.
+     *
+     */
+    public function test_badge_updated() {
+        $badge = new badge($this->badgeid);
+        $sink = $this->redirectEvents();
+
+        // Trigger and capture the event.
+        $badge->save();
+        $events = $sink->get_events();
+        $event = reset($events);
+        $this->assertCount(1, $events);
+
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\core\event\badge_updated', $event);
+        $this->assertEquals($badge->id, $event->objectid);
+        $this->assertDebuggingNotCalled();
+        $sink->close();
+
+    }
+    /**
+     * Test the badge deleted event.
+     */
+    public function test_badge_deleted() {
+        $badge = new badge($this->badgeid);
+        $sink = $this->redirectEvents();
+
+        // Trigger and capture the event.
+        $badge->delete(false);
+        $events = $sink->get_events();
+        $event = reset($events);
+        $this->assertCount(1, $events);
+
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\core\event\badge_deleted', $event);
+        $this->assertEquals($badge->id, $event->objectid);
+        $this->assertDebuggingNotCalled();
+        $sink->close();
+
+    }
+
+    /**
+     * Test the badge duplicated event.
+     *
+     */
+    public function test_badge_duplicated() {
+        $badge = new badge($this->badgeid);
+        $sink = $this->redirectEvents();
+
+        // Trigger and capture the event.
+        $newid = $badge->make_clone();
+        $events = $sink->get_events();
+        $event = reset($events);
+        $this->assertCount(1, $events);
+
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\core\event\badge_duplicated', $event);
+        $this->assertEquals($newid, $event->objectid);
+        $this->assertDebuggingNotCalled();
+        $sink->close();
+
+    }
+
+    /**
+     * Test the badge disabled event.
+     *
+     */
+    public function test_badge_disabled() {
+        $badge = new badge($this->badgeid);
+        $sink = $this->redirectEvents();
+
+        // Trigger and capture the event.
+        $badge->set_status(BADGE_STATUS_INACTIVE);
+        $events = $sink->get_events();
+        $event = reset($events);
+        $this->assertCount(2, $events);
+        $event = $events[1];
+
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\core\event\badge_disabled', $event);
+        $this->assertEquals($badge->id, $event->objectid);
+        $this->assertDebuggingNotCalled();
+        $sink->close();
+
+    }
+
+    /**
+     * Test the badge enabled event.
+     *
+     */
+    public function test_badge_enabled() {
+        $badge = new badge($this->badgeid);
+        $sink = $this->redirectEvents();
+
+        // Trigger and capture the event.
+        $badge->set_status(BADGE_STATUS_ACTIVE);
+        $events = $sink->get_events();
+        $event = reset($events);
+        $this->assertCount(2, $events);
+        $event = $events[1];
+
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\core\event\badge_enabled', $event);
+        $this->assertEquals($badge->id, $event->objectid);
+        $this->assertDebuggingNotCalled();
+        $sink->close();
+
+    }
+
+    /**
+     * Test the badge criteria added event.
+     *
+     * There is no external API for this, so the unit test will simply
+     * create and trigger the event and ensure data is returned as expected.
+     */
+    public function test_badge_criteria_added() {
+
+        $badge = new badge($this->badgeid);
+
+        $eventparams = array(
+            'userid' => $badge->usercreated,
+            'objectid' => $badge->id,
+            'context' => $badge->get_context(),
+        );
+
+        $event = \core\event\badge_criteria_added::create($eventparams);
+        // Trigger and capture the event.
+        $sink = $this->redirectEvents();
+        $event->trigger();
+        $events = $sink->get_events();
+        $event = reset($events);
+
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\core\event\badge_criteria_added', $event);
+        $this->assertEquals($badge->usercreated, $event->userid);
+        $this->assertEquals($badge->id, $event->objectid);
+        $this->assertDebuggingNotCalled();
+        $sink->close();
+
+    }
+
+    /**
+     * Test the badge criteria updated event.
+     *
+     * There is no external API for this, so the unit test will simply
+     * create and trigger the event and ensure data is returned as expected.
+     */
+    public function test_badge_criteria_updated() {
+
+        $badge = new badge($this->badgeid);
+
+        $eventparams = array(
+            'userid' => $badge->usercreated,
+            'objectid' => $badge->id,
+            'context' => $badge->get_context(),
+        );
+
+        $event = \core\event\badge_criteria_updated::create($eventparams);
+        // Trigger and capture the event.
+        $sink = $this->redirectEvents();
+        $event->trigger();
+        $events = $sink->get_events();
+        $event = reset($events);
+
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\core\event\badge_criteria_updated', $event);
+        $this->assertEquals($badge->usercreated, $event->userid);
+        $this->assertEquals($badge->id, $event->objectid);
+        $this->assertDebuggingNotCalled();
+        $sink->close();
+
+    }
+
+    /**
+     * Test the badge criteria deleted event.
+     *
+     * There is no external API for this, so the unit test will simply
+     * create and trigger the event and ensure data is returned as expected.
+     */
+    public function test_badge_criteria_deleted() {
+
+        $badge = new badge($this->badgeid);
+
+        $eventparams = array(
+            'userid' => $badge->usercreated,
+            'objectid' => $badge->id,
+            'context' => $badge->get_context(),
+        );
+
+        $event = \core\event\badge_criteria_deleted::create($eventparams);
+        // Trigger and capture the event.
+        $sink = $this->redirectEvents();
+        $event->trigger();
+        $events = $sink->get_events();
+        $event = reset($events);
+
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\core\event\badge_criteria_deleted', $event);
+        $this->assertEquals($badge->usercreated, $event->userid);
+        $this->assertEquals($badge->id, $event->objectid);
+        $this->assertDebuggingNotCalled();
+        $sink->close();
+
+    }
 }
