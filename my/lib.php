@@ -133,6 +133,12 @@ function my_reset_page($userid, $private=MY_PAGE_PRIVATE, $pagetype='my-index') 
     if (!$systempage = $DB->get_record('my_pages', array('userid' => null, 'private' => $private))) {
         return false; // error
     }
+
+    // Trigger dashboard has been reset event.
+    $context = context_user::instance($userid);
+    $eventparams = array('userid' => $userid, 'context' => $context, 'other' => array('userid' => $userid));
+    $event = \core\event\dashboard_reset::create($eventparams);
+    $event->trigger();
     return $systempage;
 }
 
@@ -144,7 +150,7 @@ function my_reset_page($userid, $private=MY_PAGE_PRIVATE, $pagetype='my-index') 
  * @return void
  */
 function my_reset_page_for_all_users($private = MY_PAGE_PRIVATE, $pagetype = 'my-index') {
-    global $DB;
+    global $DB, $USER;
 
     // This may take a while. Raise the execution time limit.
     core_php_time_limit::raise();
@@ -175,6 +181,11 @@ function my_reset_page_for_all_users($private = MY_PAGE_PRIVATE, $pagetype = 'my
 
     // We should be good to go now.
     $transaction->allow_commit();
+
+    // Trigger dashboard has been reset event.
+    $eventparams = array('userid' => $USER->id, 'context' => context_system::instance());
+    $event = \core\event\dashboards_reset::create($eventparams);
+    $event->trigger();
 }
 
 class my_syspage_block_manager extends block_manager {
