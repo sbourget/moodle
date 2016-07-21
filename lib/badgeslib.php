@@ -212,7 +212,7 @@ class badge {
      * @return bool Returns true on success.
      */
     public function save() {
-        global $DB;
+        global $DB, $USER;
 
         $fordb = new stdClass();
         foreach (get_object_vars($this) as $k => $v) {
@@ -222,6 +222,10 @@ class badge {
 
         $fordb->timemodified = time();
         if ($DB->update_record_raw('badge', $fordb)) {
+            // Trigger event, badge updated.
+            $eventparams = array('userid' => $USER->id, 'objectid' => $this->id, 'context' => $this->get_context());
+            $event = \core\event\badge_updated::create($eventparams);
+            $event->trigger();
             return true;
         } else {
             throw new moodle_exception('error:save', 'badges');
@@ -236,7 +240,7 @@ class badge {
      * @return int ID of new badge.
      */
     public function make_clone() {
-        global $DB, $USER;
+        global $DB, $USER, $PAGE;
 
         $fordb = new stdClass();
         foreach (get_object_vars($this) as $k => $v) {
@@ -274,6 +278,11 @@ class badge {
                 $crit->make_clone($new);
             }
 
+            // Trigger event, badge duplicated.
+            $eventparams = array('userid' => $USER->id, 'objectid' => $new, 'context' => $PAGE->context);
+            $event = \core\event\badge_duplicated::create($eventparams);
+            $event->trigger();
+
             return $new;
         } else {
             throw new moodle_exception('error:clone', 'badges');
@@ -310,8 +319,20 @@ class badge {
      * @param int $status Status from BADGE_STATUS constants
      */
     public function set_status($status = 0) {
+        global $USER;
         $this->status = $status;
         $this->save();
+        if ($status == BADGE_STATUS_ACTIVE) {
+            // Trigger event, badge enabled.
+            $eventparams = array('userid' => $USER->id, 'objectid' => $this->id, 'context' => $this->get_context());
+            $event = \core\event\badge_enabled::create($eventparams);
+            $event->trigger();
+        } else if ($status == BADGE_STATUS_INACTIVE) {
+            // Trigger event, badge disabled.
+            $eventparams = array('userid' => $USER->id, 'objectid' => $this->id, 'context' => $this->get_context());
+            $event = \core\event\badge_disabled::create($eventparams);
+            $event->trigger();
+        }
     }
 
     /**
@@ -623,11 +644,16 @@ class badge {
      * @param $archive bool Achive a badge without actual deleting of any data.
      */
     public function delete($archive = true) {
-        global $DB;
+        global $DB, $USER;
 
         if ($archive) {
             $this->status = BADGE_STATUS_ARCHIVED;
             $this->save();
+
+            // Trigger event, badge archived.
+            $eventparams = array('userid' => $USER->id, 'objectid' => $this->id, 'context' => $this->get_context());
+            $event = \core\event\badge_archived::create($eventparams);
+            $event->trigger();
             return;
         }
 
@@ -654,6 +680,18 @@ class badge {
 
         // Finally, remove badge itself.
         $DB->delete_records('badge', array('id' => $this->id));
+
+        // Trigger event, badge deleted.
+        $eventparams = array('userid' => $USER->id,
+            'objectid' => $this->id,
+            'context' => $this->get_context(),
+            'other' => array(
+                'badgetype' => $this->type,
+                'courseid' => $this->courseid
+            )
+            );
+        $event = \core\event\badge_deleted::create($eventparams);
+        $event->trigger();
     }
 }
 
