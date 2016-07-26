@@ -380,6 +380,16 @@ function question_delete_question($questionid) {
     // Finally delete the question record itself
     $DB->delete_records('question', array('id' => $questionid));
     question_bank::notify_question_edited($questionid);
+
+    // Log the deletion of this question.
+    $eventparams = array(
+        'contextid' => $question->contextid,
+        'objectid' => $question->id,
+        'other' => array('categoryid' => $question->category)
+    );
+
+    $event = \core\event\question_deleted::create($eventparams);
+    $event->trigger();
 }
 
 /**
