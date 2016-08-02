@@ -363,6 +363,15 @@ class question_category_object {
 
         /// Finally delete the category itself
         $DB->delete_records("question_categories", array("id" => $category->id));
+
+        // Log the deletion of this category.
+        $params = array(
+            'objectid' => $category->id,
+            'contextid' => $category->contextid
+        );
+        $event = \core\event\question_category_deleted::create($params);
+        $event->trigger();
+
     }
 
     public function move_questions_and_delete_category($oldcat, $newcat){
@@ -432,8 +441,16 @@ class question_category_object {
 
     /**
      * Updates an existing category with given params
+     *
+     * @param int $updateid
+     * @param int $newparent
+     * @param string $newname
+     * @param string $newinfo
+     * @param int $newinfoformat
+     * @param bool $redirect
+     * @return int
      */
-    public function update_category($updateid, $newparent, $newname, $newinfo, $newinfoformat = FORMAT_HTML) {
+    public function update_category($updateid, $newparent, $newname, $newinfo, $newinfoformat = FORMAT_HTML, $redirect = true) {
         global $CFG, $DB;
         if (empty($newname)) {
             print_error('categorynamecantbeblank', 'question');
@@ -470,6 +487,14 @@ class question_category_object {
         $cat->contextid = $tocontextid;
         $DB->update_record('question_categories', $cat);
 
+        // Log the update of this category.
+        $params = array(
+            'objectid' => $cat->id,
+            'contextid' => $cat->contextid
+        );
+        $event = \core\event\question_category_updated::create($params);
+        $event->trigger();
+
         // If the category name has changed, rename any random questions in that category.
         if ($oldcat->name != $cat->name) {
             $where = "qtype = 'random' AND category = ? AND " . $DB->sql_compare_text('questiontext') . " = ?";
@@ -489,6 +514,8 @@ class question_category_object {
 
         // Cat param depends on the context id, so update it.
         $this->pageurl->param('cat', $updateid . ',' . $tocontextid);
-        redirect($this->pageurl);
+        if ($redirect) {
+            redirect($this->pageurl); // Always redirect after successful action.
+        }
     }
 }
