@@ -55,6 +55,10 @@ if ($delete && confirm_sesskey()) {
                                                                'userid' => $USER->id,
                                                                'delete' => $delete));
 
+        // Log this action.
+        $eventparms = array('context' => $context, 'objectid' => $delete);
+        $event = \core\event\blog_external_blog_removed::create($eventparms);
+        $event->trigger();
         $message = get_string('externalblogdeleted', 'blog');
     }
 }
@@ -111,4 +115,8 @@ if (!empty($blogs)) {
 $newexternalurl = new moodle_url('/blog/external_blog_edit.php');
 echo html_writer::link($newexternalurl, $straddnewexternalblog);
 echo $OUTPUT->box_end();
+
+// Log this page.
+$event = \core\event\blog_external_blogs_viewed::create(array('context' => $context));
+$event->trigger();
 echo $OUTPUT->footer();
