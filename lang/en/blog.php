@@ -103,6 +103,7 @@ $string['groupblog'] = 'Group blog: {$a}';
 $string['groupblogdisable'] = 'Group blog is not enabled';
 $string['groupblogentries'] = 'Blog entries associated with {$a->coursename} by group {$a->groupname}';
 $string['groupblogs'] = 'Users can only see blogs for people who share a group';
+$string['guestcannotviewblog'] = 'Guests do not have the required permissions to view these blogs';
 $string['incorrectblogfilter'] = 'Incorrect blog filter type specified';
 $string['intro'] = 'This RSS feed was automatically generated from one or more blogs.';
 $string['invalidgroupid'] = 'Invalid group ID';
