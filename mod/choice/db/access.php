@@ -89,6 +89,17 @@ $capabilities = array(
             'user' => CAP_ALLOW,
             'guest' => CAP_ALLOW
         )
+    ),
+
+    'mod/choice:viewpublishedresults' => array(
+
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'student' => CAP_ALLOW,
+            'frontpage' => CAP_ALLOW,
+            'guest' => CAP_ALLOW
+        )
     )
 );
 
