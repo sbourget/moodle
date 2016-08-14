@@ -1032,7 +1032,7 @@ function choice_get_all_responses($choice) {
 
 
 /**
- * Return true if we are allowd to view the choice results.
+ * Return true if we are allowed to view the choice results.
  *
  * @param stdClass $choice Choice record
  * @param rows|null $current my choice responses
@@ -1060,10 +1060,14 @@ function choice_can_view_results($choice, $current = null, $choiceopen = null) {
         $current = choice_get_my_response($choice);
     }
 
-    if ($choice->showresults == CHOICE_SHOWRESULTS_ALWAYS or
-       ($choice->showresults == CHOICE_SHOWRESULTS_AFTER_ANSWER and !empty($current)) or
-       ($choice->showresults == CHOICE_SHOWRESULTS_AFTER_CLOSE and !$choiceopen)) {
-        return true;
+    $cm = get_coursemodule_from_instance('choice', $choice->id);
+    $capabilities = array('mod/choice:viewpublishedresults', 'mod/choice:readresponses');
+    if (has_any_capability($capabilities, context_module::instance($cm->id))) {
+        if ($choice->showresults == CHOICE_SHOWRESULTS_ALWAYS or
+           ($choice->showresults == CHOICE_SHOWRESULTS_AFTER_ANSWER and !empty($current)) or
+           ($choice->showresults == CHOICE_SHOWRESULTS_AFTER_CLOSE and !$choiceopen)) {
+            return true;
+        }
     }
     return false;
 }
