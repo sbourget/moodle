@@ -273,6 +273,7 @@ $string['wiki:managewiki'] = 'Manage wiki settings';
 $string['wiki:managefiles'] = 'Manage wiki files';
 $string['wiki:overridelock'] = 'Override wiki locks';
 $string['wiki:viewcomment'] = 'View page comments';
+$string['wiki:view'] = 'View wiki activity';
 $string['wiki:viewpage'] = 'View wiki pages';
 $string['wikipages'] = 'Wiki pages';
 $string['wrongversionlock'] = 'Another user has edited this page while you were editing and your content is obsolete.';
