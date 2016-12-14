@@ -877,6 +877,7 @@ class backup_calendarevents_structure_step extends backup_structure_step {
 
         $event->annotate_ids('user', 'userid');
         $event->annotate_ids('group', 'groupid');
+        $event->annotate_ids('event', 'repeatid');
         $event->annotate_files('calendar', 'event_description', 'id');
 
         // Return the root element (events)

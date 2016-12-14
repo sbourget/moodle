@@ -2666,7 +2666,7 @@ class restore_calendarevents_structure_step extends restore_structure_step {
                 'courseid'       => $this->get_courseid(),
                 'groupid'        => $data->groupid,
                 'userid'         => $data->userid,
-                'repeatid'       => $data->repeatid,
+                'repeatid'       => $this->get_mappingid('event', $data->repeatid),
                 'modulename'     => $data->modulename,
                 'eventtype'      => $data->eventtype,
                 'timestart'      => $this->apply_date_offset($data->timestart),
