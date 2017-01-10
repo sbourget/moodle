@@ -122,6 +122,11 @@ if ($eventid !== 0) {
     $event->timedurationuntil = $event->timestart + $event->timeduration;
     $event->count_repeats();
 
+    // Clear subscription information from this entry.
+    // so it will not be removed or edit if the origional subscription is removed.
+    $event->uuid = '';
+    $event->subscriptionid = null;
+
     if (!calendar_add_event_allowed($event)) {
         print_error('nopermissions');
     }
