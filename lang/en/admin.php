@@ -352,6 +352,7 @@ $string['configthemedesignermode'] = 'Normally all theme images and style sheets
 $string['configthemelist'] = 'Leave this blank to allow any valid theme to be used.  If you want to shorten the theme menu, you can specify a comma-separated list of names here (Don\'t use spaces!).
 For example:  standard,orangewhite.';
 $string['configtimezone'] = 'This is the default timezone for displaying dates - each user can override this setting in their profile. Cron tasks and other server settings are specified in this timezone. You should change the setting if it shows as "Invalid timezone"';
+$string['configuploadfilesizelimits'] = 'This specifies the available maximum upload sizes that can be used throughout the iste.  Sizes should be entered in bytes as a is a comma seperated list.  If this is left blank, the default values will be used.';
 $string['configuseblogassociations'] = 'Should users be able to organize their blog by associating entries with courses and course modules?';
 $string['configuseexternalyui'] = 'Instead of using local files, use online files available on Yahoo&#145;s servers. WARNING: This requires an internet connection, or no AJAX will work on your site. This setting is not compatible with sites using https.';
 $string['configusesitenameforsitepages'] = 'If enabled the site\'s shortname will be used for the site pages node in the navigation rather than the string \'Site pages\'';
@@ -1202,6 +1203,7 @@ $string['upgradetimedout'] = 'Upgrade timed out, please restart the upgrade.';
 $string['upgradingdata'] = 'Upgrading data';
 $string['upgradinglogs'] = 'Upgrading logs';
 $string['upgradingversion'] = 'Upgrading to new version';
+$string['uploadfilesizelimits'] = 'Upload file size limits';
 $string['upwards'] = 'upwards';
 $string['useblogassociations'] = 'Enable associations';
 $string['useexternalyui'] = 'Use online YUI libraries';

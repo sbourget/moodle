@@ -27,8 +27,14 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     if (!empty($CFG->maxbytes)) {
         $maxbytes = $CFG->maxbytes;
     }
+    $sizelist = "10240,51200,102400,512000,1048576,2097152," .
+                  "5242880,10485760,20971520,52428800,104857600," .
+                  "262144000,524288000,786432000,1073741824";
+    $temp->add(new admin_setting_configtext('uploadsizes', new lang_string('uploadfilesizelimits', 'admin'),
+                new lang_string('configuploadfilesizelimits', 'admin'), $sizelist , PARAM_SEQUENCE, 255));
+    
     $max_upload_choices = get_max_upload_sizes(0, 0, 0, $maxbytes);
-    // maxbytes set to 0 will allow the maximum server limit for uploads
+    // maxbytes set to 0 will allow the maximum server limit for uploads.
     $temp->add(new admin_setting_configselect('maxbytes', new lang_string('maxbytes', 'admin'), new lang_string('configmaxbytes', 'admin'), 0, $max_upload_choices));
     // 100MB
     $defaultuserquota = 104857600;

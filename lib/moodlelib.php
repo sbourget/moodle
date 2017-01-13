@@ -6588,9 +6588,15 @@ function get_max_upload_sizes($sitebytes = 0, $coursebytes = 0, $modulebytes = 0
     }
 
     $filesize = array();
-    $sizelist = array(10240, 51200, 102400, 512000, 1048576, 2097152,
-                      5242880, 10485760, 20971520, 52428800, 104857600);
-
+    if (isset($CFG->uploadsizes) && !empty($CFG->uploadsizes)) {
+        // Get the config list of options
+        $sizelist = explode(",", $CFG->uploadsizes);
+    } else {
+        // Use some reasonable defaults.
+        $sizelist = array(10240, 51200, 102400, 512000, 1048576, 2097152,
+                          5242880, 10485760, 20971520, 52428800, 104857600,
+                          262144000, 524288000, 786432000, 1073741824);
+    }
     // If custombytes is given and is valid then add it to the list.
     if (is_number($custombytes) and $custombytes > 0) {
         $custombytes = (int)$custombytes;
