@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the overall badge award criteria type
+ * This file contains the overall badge criteria award class
  *
  * @package    core
  * @subpackage badges
@@ -30,20 +30,22 @@ defined('MOODLE_INTERNAL') || die();
  * Overall badge award criteria
  *
  */
-class award_criteria_overall extends award_criteria {
+class badgecriteria_overall_award extends badgecriteria_award {
 
-    /* @var int Criteria [BADGE_CRITERIA_TYPE_OVERALL] */
-    public $criteriatype = BADGE_CRITERIA_TYPE_OVERALL;
+    /* @var string Criteria ['overall'] */
+    public $criteriatype = 'overall';
+    /* @var array Supported badge types */
+    public static $supportedtypes = array(BADGE_TYPE_COURSE, BADGE_TYPE_SITE);
 
     /**
      * Add appropriate form elements to the criteria form
      *
-     * @param stdClass $data details of overall criterion
+     * @param badge $badge Badge being edited
      */
-    public function config_form_criteria($data) {
+    public function config_form_criteria(badge $badge) {
         global $OUTPUT;
         $prefix = 'criteria-' . $this->id;
-        if (count($data->criteria) > 2) {
+        if ($badge->has_criteria() && !$badge->has_one_criterion()) {
             echo $OUTPUT->box_start();
             if (!empty($this->description)) {
                 $badge = new badge($this->badgeid);
@@ -53,8 +55,8 @@ class award_criteria_overall extends award_criteria {
             }
             echo $OUTPUT->heading($this->get_title(), 2);
 
-            $agg = $data->get_aggregation_methods();
-            if (!$data->is_locked() && !$data->is_active()) {
+            $agg = $badge->get_aggregation_methods();
+            if (!$badge->is_locked() && !$badge->is_active()) {
                 $editurl = new moodle_url('/badges/criteria_settings.php',
                                array('badgeid' => $this->badgeid,
                                    'edit' => true,
@@ -66,13 +68,13 @@ class award_criteria_overall extends award_criteria {
                               array('class' => 'criteria-action'));
                 echo $OUTPUT->box($editaction, array('criteria-header'));
 
-                $url = new moodle_url('criteria.php', array('id' => $data->id, 'sesskey' => sesskey()));
-                echo $OUTPUT->single_select($url, 'update', $agg, $data->get_aggregation_method($this->criteriatype),
+                $url = new moodle_url('criteria.php', array('id' => $badge->id, 'sesskey' => sesskey()));
+                echo $OUTPUT->single_select($url, 'update', $agg, $badge->get_aggregation_method($this->criteriatype),
                     null, null, array('aria-describedby' => 'overall'));
                 echo html_writer::span(get_string('overallcrit', 'badges'), '', array('id' => 'overall'));
             } else {
-                echo $OUTPUT->box(get_string('criteria_descr_' . $this->criteriatype, 'badges',
-                        core_text::strtoupper($agg[$data->get_aggregation_method()])), 'clearfix');
+                echo $OUTPUT->box(get_string('description', 'badgecriteria_' . $this->criteriatype,
+                        core_text::strtoupper($agg[$badge->get_aggregation_method()])), 'clearfix');
             }
             echo $OUTPUT->box_end();
         }
@@ -87,10 +89,10 @@ class award_criteria_overall extends award_criteria {
 
     /**
      * Get criteria details for displaying to users
-     *
+     * @param short boolean
      * @return string
      */
-    public function get_details($short = '') {
+    public function get_details($short = false) {
     }
 
     /**
@@ -116,21 +118,23 @@ class award_criteria_overall extends award_criteria {
         $params = array(
                     'userid' => $userid,
                     'badgeid' => $this->badgeid,
-                    'criteriatype' => BADGE_CRITERIA_TYPE_OVERALL
+                    'criteriatype' => 'overall'
                 );
 
         $criteria = $DB->get_records_sql($sql, $params);
         $overall = false;
         foreach ($criteria as $crit) {
+            // Check the award criteria exists.
+            $critobj = badgecriteria_award::build((array)$crit);
             if ($this->method == BADGE_CRITERIA_AGGREGATION_ALL) {
-                if ($crit->datemet === null) {
+                if (!$critobj || $crit->datemet === null) {
                     return false;
                 } else {
                     $overall = true;
                     continue;
                 }
             } else {
-                if ($crit->datemet === null) {
+                if (!$critobj || $crit->datemet === null) {
                     $overall = false;
                     continue;
                 } else {

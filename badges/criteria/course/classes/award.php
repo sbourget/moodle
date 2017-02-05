@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the course completion badge award criteria type class
+ * This file contains the course completion badge criteria award class
  *
  * @package    core
  * @subpackage badges
@@ -25,6 +25,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
 require_once($CFG->libdir . '/completionlib.php');
 require_once($CFG->dirroot . '/grade/querylib.php');
 require_once($CFG->libdir . '/gradelib.php');
@@ -33,10 +34,12 @@ require_once($CFG->libdir . '/gradelib.php');
  * Badge award criteria -- award on course completion
  *
  */
-class award_criteria_course extends award_criteria {
+class badgecriteria_course_award extends badgecriteria_award {
 
-    /* @var int Criteria [BADGE_CRITERIA_TYPE_COURSE] */
-    public $criteriatype = BADGE_CRITERIA_TYPE_COURSE;
+    /* @var string Criteria ['course'] */
+    public $criteriatype = 'course';
+    /* @var array Supported badge types */
+    public static $supportedtypes = array(BADGE_TYPE_COURSE);
 
     private $courseid;
     private $course;
@@ -57,10 +60,10 @@ class award_criteria_course extends award_criteria {
     /**
      * Add appropriate form elements to the criteria form
      *
-     * @param moodleform $mform  Moodle forms object
+     * @param badge $badge Badge being edited
      * @param stdClass $data details of various modules
      */
-    public function config_form_criteria($data) {
+    public function config_form_criteria(badge $badge) {
         global $OUTPUT;
 
         $editurl = new moodle_url('/badges/criteria_settings.php', array('badgeid' => $this->badgeid, 'edit' => true, 'type' => $this->criteriatype, 'crit' => $this->id));
@@ -69,10 +72,10 @@ class award_criteria_course extends award_criteria {
         $deleteaction = $OUTPUT->action_icon($deleteurl, new pix_icon('t/delete', get_string('delete')), null, array('class' => 'criteria-action'));
 
         echo $OUTPUT->box_start();
-        if (!$data->is_locked() && !$data->is_active()) {
+        if (!$badge->is_locked() && !$badge->is_active()) {
             echo $OUTPUT->box($deleteaction . $editaction, array('criteria-header'));
         }
-        echo $OUTPUT->heading($this->get_title() . $OUTPUT->help_icon('criteria_' . $this->criteriatype, 'badges'), 3, 'main help');
+        echo $OUTPUT->heading($this->get_title() . $OUTPUT->help_icon('pluginname', 'badgecriteria_' . $this->criteriatype), 3, 'main help');
 
         if (!empty($this->description)) {
             echo $OUTPUT->box(
@@ -84,7 +87,7 @@ class award_criteria_course extends award_criteria {
         }
 
         if (!empty($this->params)) {
-            echo $OUTPUT->box(get_string('criteria_descr_' . $this->criteriatype, 'badges') . $this->get_details(), array('clearfix'));
+            echo $OUTPUT->box(get_string('description', 'badgecriteria_' . $this->criteriatype) . $this->get_details(), array('clearfix'));
         }
         echo $OUTPUT->box_end();
     }
@@ -92,9 +95,10 @@ class award_criteria_course extends award_criteria {
     /**
      * Get criteria details for displaying to users
      *
+     * @param short boolean
      * @return string
      */
-    public function get_details($short = '') {
+    public function get_details($short = false) {
         global $DB, $OUTPUT;
         $param = reset($this->params);
 
@@ -132,10 +136,10 @@ class award_criteria_course extends award_criteria {
 
         if (!($course->enablecompletion == COMPLETION_ENABLED)) {
             $none = true;
-            $message = get_string('completionnotenabled', 'badges');
+            $message = get_string('completionnotenabled', 'badgecriteria_course');
         } else {
             $mform->addElement('header', 'criteria_course', $this->get_title());
-            $mform->addHelpButton('criteria_course', 'criteria_' . $this->criteriatype, 'badges');
+            $mform->addHelpButton('criteria_course', 'pluginname', 'badgecriteria_' . $this->criteriatype);
             $parameter = array();
             $parameter[] =& $mform->createElement('static', 'mgrade_', null, get_string('mingrade', 'badges'));
             $parameter[] =& $mform->createElement('text', 'grade_' . $param['course'], '', array('size' => '5'));
