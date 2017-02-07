@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,15 +16,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Admin settings and defaults.
  *
- * @package    auth_pam
- * @copyright  1999 onwards Martin Dougiamas (http://dougiamas.com)
+ * @package auth_pam
+ * @copyright  2017 Stephen Bourget
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2017020700;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2016112900;        // Requires this Moodle version
-$plugin->component = 'auth_pam';       // Full name of the plugin (used for diagnostics)
+if ($ADMIN->fulltree) {
+
+    // Introductory explanation.
+    $settings->add(new admin_setting_heading('auth_pam/pluginname', '', new lang_string('auth_pamdescription', 'auth_pam')));
+
+    // Display locking / mapping of profile fields.
+    $authplugin = get_auth_plugin($this->name);
+    display_auth_lock_options($settings, $authplugin->authtype, $authplugin->userfields, get_string('auth_fieldlocks_help', 'auth'), false, false);
+}
