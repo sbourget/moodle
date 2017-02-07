@@ -6491,7 +6491,7 @@ class admin_setting_manageauths extends admin_setting {
         $usercount = $DB->count_records('user', array('auth'=>'manual', 'deleted'=>0));
         $table->data[] = array($displayname, $usercount, '', '', $settings, '', '');
         $displayname = $displayauths['nologin'];
-        $settings = "<a href=\"auth_config.php?auth=nologin\">{$txt->settings}</a>";
+        $settings = '';
         $usercount = $DB->count_records('user', array('auth'=>'nologin', 'deleted'=>0));
         $table->data[] = array($displayname, $usercount, '', '', $settings, '', '');
 
@@ -6547,8 +6547,10 @@ class admin_setting_manageauths extends admin_setting {
             // settings link
             if (file_exists($CFG->dirroot.'/auth/'.$auth.'/settings.php')) {
                 $settings = "<a href=\"settings.php?section=authsetting$auth\">{$txt->settings}</a>";
-            } else {
+            } else if (file_exists($CFG->dirroot.'/auth/'.$auth.'/config.html')) {
                 $settings = "<a href=\"auth_config.php?auth=$auth\">{$txt->settings}</a>";
+            } else {
+                $settings = '';
             }
 
             // Uninstall link.
