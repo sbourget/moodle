@@ -15,15 +15,31 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * No authentication plugin upgrade code
  *
  * @package    auth_none
- * @copyright  2011 Petr Skoda (http://skodak.org)
+ * @copyright  2017 Stephen Bourget
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2017020700;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2016112900;        // Requires this Moodle version
-$plugin->component = 'auth_none';       // Full name of the plugin (used for diagnostics)
+/**
+ * @param int $oldversion the version we are upgrading from
+ * @return bool result
+ */
+function xmldb_auth_none_upgrade($oldversion) {
+    global $CFG, $DB;
+
+    // Automatically generated Moodle v3.2.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    if ($oldversion < 2017020700) {
+        // Convert info in config plugins from auth/none to auth_none
+        $DB->set_field('config_plugins', 'plugin', 'auth_none', array('plugin' => 'auth/none'));
+        upgrade_plugin_savepoint(true, 2017020700, 'auth', 'none');
+    }
+    
+    return true;
+}
+
