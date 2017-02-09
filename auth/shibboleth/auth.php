@@ -351,6 +351,27 @@ class auth_plugin_shibboleth extends auth_plugin_base {
 
         return $clean_string;
     }
+
+    /**
+     * Test if settings are correct, print info to output.
+     * 
+     */
+    function test_settings() {
+        global $OUTPUT;
+        
+        if (!isset($this->config->user_attribute) || empty($this->config->user_attribute)) {
+            echo $OUTPUT->notification(get_string("shib_not_set_up_error", "auth_shibboleth"), 'notifyproblem');
+            return;
+        }
+        if ($this->config->convert_data and $this->config->convert_data != '' and !is_readable($this->config->convert_data)) {
+            echo $OUTPUT->notification(get_string("auth_shib_convert_data_warning", "auth_shibboleth"), 'notifyproblem');
+            return;
+        }
+        if (isset($this->config->organization_selection) && empty($this->config->organization_selection) && isset($this->config->alt_login) && $this->config->alt_login == 'on') {
+            echo $OUTPUT->notification(get_string("auth_shib_no_organizations_warning", "auth_shibboleth"), 'notifyproblem');
+            return;
+        }
+    }
 }
 
 
