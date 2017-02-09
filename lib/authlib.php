@@ -996,12 +996,12 @@ function display_auth_lock_options($settings, $auth, $user_fields, $helptext, $m
             $settings->add(new admin_setting_configtext("auth_{$auth}/field_updateremote_{$field}", $fieldname, '', '', PARAM_ALPHANUMEXT, 30));
 
             // Update local.
-            $settings->add(new admin_setting_configselect("auth_{$auth}/field_updateremote_{$field}",
+            $settings->add(new admin_setting_configselect("auth_{$auth}/field_updatelocal_{$field}",
                     get_string('auth_updatelocal', 'auth'), '', 'oncreate', $updatelocaloptions));
             
             // Update remote.
             if ($updateremotefields) {
-                    $settings->add(new admin_setting_configselect("auth_{$auth}/field_updatelocal_{$field}",
+                    $settings->add(new admin_setting_configselect("auth_{$auth}/field_updateremote_{$field}",
                         get_string('auth_updateremote', 'auth'),'',0, $updateextoptions));
             }
 
