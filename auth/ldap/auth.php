@@ -89,7 +89,7 @@ class auth_plugin_ldap extends auth_plugin_base {
      * Init plugin config from database settings depending on the plugin auth type.
      */
     function init_plugin($authtype) {
-        $this->pluginconfig = 'auth/'.$authtype;
+        $this->pluginconfig = 'auth_'.$authtype;
         $this->config = get_config($this->pluginconfig);
         if (empty($this->config->ldapencoding)) {
             $this->config->ldapencoding = 'utf-8';
@@ -2312,4 +2312,42 @@ class auth_plugin_ldap extends auth_plugin_base {
         return (bool)$user->suspended;
     }
 
+    /**
+     * Test if settings are correct, print info to output.
+     * 
+     */
+    function test_settings() {
+        global $OUTPUT;
+
+        if (!function_exists('ldap_connect')) { // Is php-ldap really there?
+            echo $OUTPUT->notification(get_string('auth_ldap_noextension', 'auth_ldap'));
+            return;
+        }
+
+        // Check to see if this is actually configured.
+        if ((isset($this->config->host_url)) && ($this->config->host_url !== '')) {                
+
+            try {
+                $ldapconn = $this->ldap_connect();
+                // Try to connect to the LDAP server.  See if the page size setting is supported on this server.
+                $pagedresultssupported = ldap_paged_results_supported($this->config->ldap_version, $ldapconn);
+            } catch (Exception $e) {
+
+                // If we couldn't connect and get the supported options, we can only assume we don't support paged results.
+                $pagedresultssupported = false;
+            }
+
+            // Display paged file results.
+            if ((!$pagedresultssupported)) {
+                echo $OUTPUT->notification(get_string('pagedresultsnotsupp', 'auth_ldap'), \core\output\notification::NOTIFY_INFO);
+            } else if ($ldapconn) {
+                // We were able to connect successfuly
+                echo $OUTPUT->notification(get_string('connectingldapsuccess', 'auth_ldap'), \core\output\notification::NOTIFY_SUCCESS);
+            }
+
+        } else {
+            // LDAP is not even configured.
+            echo $OUTPUT->notification(get_string('ldapnotconfigured', 'auth_ldap'), \core\output\notification::NOTIFY_INFO);
+        }
+    }
 } // End of the class

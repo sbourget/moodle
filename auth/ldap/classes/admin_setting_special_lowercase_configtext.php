@@ -15,16 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * Special setting for auth_ldap that lowercases values on save..
  *
  * @package    auth_ldap
- * @author     Martin Dougiamas
- * @author     Iñaki Arenaza
+ * @copyright  2017 Stephen Bourget
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+class auth_ldap_admin_setting_special_lowercase_configtext extends admin_setting_configtext {
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version   = 2017020700;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2016112900;        // Requires this Moodle version
-$plugin->component = 'auth_ldap';       // Full name of the plugin (used for diagnostics)
+    /**
+     * We need to convert the data to lowercase prior to save.
+     *
+     * @param string $data Form data.
+     * @return string Empty when no errors.
+     */
+    public function write_setting($data) {
+        return parent::write_setting(core_text::strtolower($data));
+    }
+}
