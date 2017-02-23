@@ -169,7 +169,8 @@ class auth_plugin_manual extends auth_plugin_base {
      * @return void
      */
     function config_form($config, $err, $user_fields) {
-        include 'config.html';
+        debugging('auth_manual has been migrated to settings.php.  Please upgrade your code');
+
     }
 
     /**
@@ -207,21 +208,8 @@ class auth_plugin_manual extends auth_plugin_base {
      * @return void
      */
     function process_config($config) {
-        // Set to defaults if undefined.
-        if (!isset($config->expiration)) {
-            $config->expiration = '';
-        }
-        if (!isset($config->expiration_warning)) {
-            $config->expiration_warning = '';
-        }
-        if (!isset($config->expirationtime)) {
-            $config->expirationtime = '';
-        }
+        debugging('auth_manual has been migrated to settings.php.  Please upgrade your code');
 
-        // Save settings.
-        set_config('expiration', $config->expiration, self::COMPONENT_NAME);
-        set_config('expiration_warning', $config->expiration_warning, self::COMPONENT_NAME);
-        set_config('expirationtime', $config->expirationtime, self::COMPONENT_NAME);
         return true;
     }
 

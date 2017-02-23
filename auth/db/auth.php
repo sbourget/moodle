@@ -670,10 +670,7 @@ class auth_plugin_db extends auth_plugin_base {
      * @return void
      */
      function validate_form($form, &$err) {
-        if ($form->passtype === 'internal') {
-            $this->config->changepasswordurl = '';
-            set_config('changepasswordurl', '', 'auth/db');
-        }
+        debugging('auth_db has been migrated to settings.php.  Please upgrade your code');
     }
 
     function prevent_local_passwords() {
@@ -764,7 +761,7 @@ class auth_plugin_db extends auth_plugin_base {
      * @return void
      */
     function config_form($config, $err, $user_fields) {
-        include 'config.html';
+        debugging('auth_db has been migrated to settings.php.  Please upgrade your code');
     }
 
     /**
@@ -774,70 +771,7 @@ class auth_plugin_db extends auth_plugin_base {
      * @return bool always true or exception
      */
     function process_config($config) {
-        // set to defaults if undefined
-        if (!isset($config->host)) {
-            $config->host = 'localhost';
-        }
-        if (!isset($config->type)) {
-            $config->type = 'mysql';
-        }
-        if (!isset($config->sybasequoting)) {
-            $config->sybasequoting = 0;
-        }
-        if (!isset($config->name)) {
-            $config->name = '';
-        }
-        if (!isset($config->user)) {
-            $config->user = '';
-        }
-        if (!isset($config->pass)) {
-            $config->pass = '';
-        }
-        if (!isset($config->table)) {
-            $config->table = '';
-        }
-        if (!isset($config->fielduser)) {
-            $config->fielduser = '';
-        }
-        if (!isset($config->fieldpass)) {
-            $config->fieldpass = '';
-        }
-        if (!isset($config->passtype)) {
-            $config->passtype = 'plaintext';
-        }
-        if (!isset($config->extencoding)) {
-            $config->extencoding = 'utf-8';
-        }
-        if (!isset($config->setupsql)) {
-            $config->setupsql = '';
-        }
-        if (!isset($config->debugauthdb)) {
-            $config->debugauthdb = 0;
-        }
-        if (!isset($config->removeuser)) {
-            $config->removeuser = AUTH_REMOVEUSER_KEEP;
-        }
-        if (!isset($config->changepasswordurl)) {
-            $config->changepasswordurl = '';
-        }
-
-        // Save settings.
-        set_config('host',          $config->host,          'auth/db');
-        set_config('type',          $config->type,          'auth/db');
-        set_config('sybasequoting', $config->sybasequoting, 'auth/db');
-        set_config('name',          $config->name,          'auth/db');
-        set_config('user',          $config->user,          'auth/db');
-        set_config('pass',          $config->pass,          'auth/db');
-        set_config('table',         $config->table,         'auth/db');
-        set_config('fielduser',     $config->fielduser,     'auth/db');
-        set_config('fieldpass',     $config->fieldpass,     'auth/db');
-        set_config('passtype',      $config->passtype,      'auth/db');
-        set_config('extencoding',   trim($config->extencoding), 'auth/db');
-        set_config('setupsql',      trim($config->setupsql),'auth/db');
-        set_config('debugauthdb',   $config->debugauthdb,   'auth/db');
-        set_config('removeuser',    $config->removeuser,    'auth/db');
-        set_config('changepasswordurl', trim($config->changepasswordurl), 'auth/db');
-
+        debugging('auth_db has been migrated to settings.php.  Please upgrade your code');
         return true;
     }
 

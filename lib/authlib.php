@@ -405,8 +405,10 @@ class auth_plugin_base {
      * @param object $config
      * @param object $err
      * @param array $user_fields
+     * @deprecated since Moodle 3.3
      */
     function config_form($config, $err, $user_fields) {
+        debugging('Use of config.html files have been depreciated, please update your code to use the admin settings API.');
         //override if needed
     }
 
@@ -415,8 +417,10 @@ class auth_plugin_base {
      * do stuff before it is inserted in config_plugin
      * @param object object with submitted configuration settings (without system magic quotes)
      * @param array $err array of error messages
+     * @deprecated since Moodle 3.3
      */
      function validate_form($form, &$err) {
+        debugging('Use of config.html files have been depreciated, please update your code to use the admin settings API.');
         //override if needed
     }
 
@@ -424,8 +428,10 @@ class auth_plugin_base {
      * Processes and stores configuration data for this authentication plugin.
      *
      * @param object object with submitted configuration settings (without system magic quotes)
+     * @deprecated since Moodle 3.3
      */
     function process_config($config) {
+        debugging('Use of config.html files have been depreciated, please update your code to use the admin settings API.');
         //override if needed
         return true;
     }

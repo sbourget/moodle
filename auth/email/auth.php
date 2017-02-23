@@ -245,20 +245,14 @@ class auth_plugin_email extends auth_plugin_base {
      * @param array $page An object containing all the data for this page.
      */
     function config_form($config, $err, $user_fields) {
-        include "config.html";
+        debugging('auth_email has been migrated to settings.php.  Please upgrade your code');
     }
 
     /**
      * Processes and stores configuration data for this authentication plugin.
      */
     function process_config($config) {
-        // set to defaults if undefined
-        if (!isset($config->recaptcha)) {
-            $config->recaptcha = false;
-        }
-
-        // save settings
-        set_config('recaptcha', $config->recaptcha, 'auth/email');
+        debugging('auth_email has been migrated to settings.php.  Please upgrade your code');
         return true;
     }
 

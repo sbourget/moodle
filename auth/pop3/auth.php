@@ -146,38 +146,16 @@ class auth_plugin_pop3 extends auth_plugin_base {
      * @param array $page An object containing all the data for this page.
      */
     function config_form($config, $err, $user_fields) {
-        global $OUTPUT;
+        debugging('auth_pop3 has been migrated to settings.php.  Please upgrade your code');
 
-        include "config.html";
     }
 
     /**
      * Processes and stores configuration data for this authentication plugin.
      */
     function process_config($config) {
-        // set to defaults if undefined
-        if (!isset ($config->host)) {
-            $config->host = '127.0.0.1';
-        }
-        if (!isset ($config->type)) {
-            $config->type = 'pop3notls';
-        }
-        if (!isset ($config->port)) {
-            $config->port = '143';
-        }
-        if (!isset ($config->mailbox)) {
-            $config->mailbox = 'INBOX';
-        }
-        if (!isset($config->changepasswordurl)) {
-            $config->changepasswordurl = '';
-        }
+        debugging('auth_pop3 has been migrated to settings.php.  Please upgrade your code');
 
-        // save settings
-        set_config('host',    $config->host,    'auth/pop3');
-        set_config('type',    $config->type,    'auth/pop3');
-        set_config('port',    $config->port,    'auth/pop3');
-        set_config('mailbox', $config->mailbox, 'auth/pop3');
-        set_config('changepasswordurl', $config->changepasswordurl, 'auth/pop3');
 
         return true;
     }

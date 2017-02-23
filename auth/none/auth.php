@@ -143,7 +143,7 @@ class auth_plugin_none extends auth_plugin_base {
      * @param array $page An object containing all the data for this page.
      */
     function config_form($config, $err, $user_fields) {
-        include "config.html";
+        debugging('auth_none has been migrated to settings.php.  Please upgrade your code');
     }
 
     /**
