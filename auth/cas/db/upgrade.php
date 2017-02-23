@@ -58,5 +58,11 @@ function xmldb_auth_cas_upgrade($oldversion) {
     // Automatically generated Moodle v3.2.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2017020700) {
+        // Convert info in config plugins from auth/ldap to auth_ldap
+        $DB->set_field('config_plugins', 'plugin', 'auth_cas', array('plugin' => 'auth/cas'));
+        upgrade_plugin_savepoint(true, 2017020700, 'auth', 'cas');
+    }
+
     return true;
 }
