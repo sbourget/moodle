@@ -15,7 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Special setting for auth_shibboleth WAYF.
+ * Special settings for auth_shibboleth WAYF.
+ *
+ * @package    auth_shibboleth
+ * @copyright  2017 Stephen Bourget
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Special settings for auth_shibboleth WAYF.
  *
  * @package    auth_shibboleth
  * @copyright  2017 Stephen Bourget
@@ -45,16 +55,16 @@ class auth_shibboleth_admin_setting_special_wayf_select extends admin_setting_co
      */
     public function write_setting($data) {
         global $CFG;
-        
+
         // Overwrite alternative login URL if integrated WAYF is used.
-        if (isset($data) && $data == 'on'){
+        if (isset($data) && $data == 'on') {
             set_config('alt_login', $data, 'auth_shibboleth');
             set_config('alternateloginurl', $CFG->wwwroot.'/auth/shibboleth/login.php');
         } else {
             // Check if integrated WAYF was enabled and is now turned off.
             // If it was and only then, reset the Moodle alternate URL.
-            $oldsetting = get_config('auth_shibboleth','alt_login');
-            if (isset($oldsetting) and $oldsetting == 'on'){
+            $oldsetting = get_config('auth_shibboleth', 'alt_login');
+            if (isset($oldsetting) and $oldsetting == 'on') {
                 set_config('alt_login', 'off', 'auth_shibboleth');
                 set_config('alternateloginurl', '');
             }

@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Function to upgrade auth_manual.
  * @param int $oldversion the version we are upgrading from
  * @return bool result
  */
@@ -47,10 +48,10 @@ function xmldb_auth_manual_upgrade($oldversion) {
     // Put any upgrade step following this.
 
     if ($oldversion < 2017020700) {
-        // Convert info in config plugins from auth/manual to auth_manual
+        // Convert info in config plugins from auth/manual to auth_manual.
         $DB->set_field('config_plugins', 'plugin', 'auth_manual', array('plugin' => 'auth/manual'));
         upgrade_plugin_savepoint(true, 2017020700, 'auth', 'manual');
     }
-    
+
     return true;
 }

@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Function to upgrade auth_email.
  * @param int $oldversion the version we are upgrading from
  * @return bool result
  */
@@ -35,11 +36,11 @@ function xmldb_auth_email_upgrade($oldversion) {
     // Put any upgrade step following this.
 
     if ($oldversion < 2017020700) {
-        // Convert info in config plugins from auth/email to auth_email
+        // Convert info in config plugins from auth/email to auth_email.
         $DB->set_field('config_plugins', 'plugin', 'auth_email', array('plugin' => 'auth/email'));
         upgrade_plugin_savepoint(true, 2017020700, 'auth', 'email');
     }
-    
+
     return true;
 }
 

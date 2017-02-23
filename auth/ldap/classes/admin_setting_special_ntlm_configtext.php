@@ -15,7 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Special setting for auth_ldap that lowercases values on save..
+ * Special admin setting for auth_ldap that validates ntlm usernames.
+ *
+ * @package    auth_ldap
+ * @copyright  2017 Stephen Bourget
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Special admin setting for auth_ldap that validates ntlm usernames.
  *
  * @package    auth_ldap
  * @copyright  2017 Stephen Bourget
@@ -30,14 +40,14 @@ class auth_ldap_admin_setting_special_ntlm_configtext extends admin_setting_conf
      * @return string Empty when no errors.
      */
     public function validate($data) {
-        
-        if(get_config('auth_ldap', 'ntlmsso_type') === 'ntlm') {
+
+        if (get_config('auth_ldap', 'ntlmsso_type') === 'ntlm') {
             $format = trim($data);
             if (!empty($format) && !preg_match('/%username%/i', $format)) {
                 return get_string('auth_ntlmsso_missing_username', 'auth_ldap');
             }
         }
+
         return parent::validate($data);
-        
     }
 }

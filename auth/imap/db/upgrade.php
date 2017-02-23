@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Function to upgrade auth_imap.
  * @param int $oldversion the version we are upgrading from
  * @return bool result
  */
@@ -35,11 +36,11 @@ function xmldb_auth_imap_upgrade($oldversion) {
     // Put any upgrade step following this.
 
     if ($oldversion < 2017020700) {
-        // Convert info in config plugins from auth/imap to auth_imap
+        // Convert info in config plugins from auth/imap to auth_imap.
         $DB->set_field('config_plugins', 'plugin', 'auth_imap', array('plugin' => 'auth/imap'));
         upgrade_plugin_savepoint(true, 2017020700, 'auth', 'imap');
     }
-    
+
     return true;
 }
 

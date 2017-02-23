@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Function to upgrade auth_db.
  * @param int $oldversion the version we are upgrading from
  * @return bool result
  */
@@ -35,10 +36,10 @@ function xmldb_auth_db_upgrade($oldversion) {
     // Put any upgrade step following this.
 
     if ($oldversion < 2017020700) {
-        // Convert info in config plugins from auth/db to auth_db
+        // Convert info in config plugins from auth/db to auth_db.
         $DB->set_field('config_plugins', 'plugin', 'auth_db', array('plugin' => 'auth/db'));
         upgrade_plugin_savepoint(true, 2017020700, 'auth', 'db');
     }
-    
+
     return true;
 }

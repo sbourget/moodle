@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -38,7 +37,8 @@ if ($ADMIN->fulltree) {
     );
 
     $settings->add(new admin_setting_configselect('auth_manual/expiration',
-        new lang_string('expiration', 'auth_manual'), new lang_string('expiration_desc', 'auth_manual'), 0, $expirationoptions));
+        new lang_string('expiration', 'auth_manual'),
+        new lang_string('expiration_desc', 'auth_manual'), 0, $expirationoptions));
 
     $expirationtimeoptions = array(
         '30' => new lang_string('numdays', '', 30),
@@ -51,7 +51,8 @@ if ($ADMIN->fulltree) {
     );
 
     $settings->add(new admin_setting_configselect('auth_manual/expirationtime',
-        new lang_string('passwdexpiretime', 'auth_manual'), new lang_string('passwdexpiretime_desc', 'auth_manual'), 30, $expirationtimeoptions));
+        new lang_string('passwdexpiretime', 'auth_manual'),
+        new lang_string('passwdexpiretime_desc', 'auth_manual'), 30, $expirationtimeoptions));
 
     $expirationwarningoptions = array(
         '0' => new lang_string('never'),
@@ -67,9 +68,11 @@ if ($ADMIN->fulltree) {
     );
 
     $settings->add(new admin_setting_configselect('auth_manual/expiration_warning',
-        new lang_string('expiration_warning', 'auth_manual'), new lang_string('expiration_warning_desc', 'auth_manual'), 0, $expirationwarningoptions));
+        new lang_string('expiration_warning', 'auth_manual'),
+        new lang_string('expiration_warning_desc', 'auth_manual'), 0, $expirationwarningoptions));
 
     // Display locking / mapping of profile fields.
     $authplugin = get_auth_plugin($this->name);
-    display_auth_lock_options($settings, $authplugin->authtype, $authplugin->userfields, get_string('auth_fieldlocks_help', 'auth'), false, false);
+    display_auth_lock_options($settings, $authplugin->authtype,
+        $authplugin->userfields, get_string('auth_fieldlocks_help', 'auth'), false, false);
 }

@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Function to upgrade auth_ldap.
  * @param int $oldversion the version we are upgrading from
  * @return bool result
  */
@@ -59,7 +60,7 @@ function xmldb_auth_ldap_upgrade($oldversion) {
     // Put any upgrade step following this.
 
     if ($oldversion < 2017020700) {
-        // Convert info in config plugins from auth/ldap to auth_ldap
+        // Convert info in config plugins from auth/ldap to auth_ldap.
         $DB->set_field('config_plugins', 'plugin', 'auth_ldap', array('plugin' => 'auth/ldap'));
         upgrade_plugin_savepoint(true, 2017020700, 'auth', 'ldap');
     }
