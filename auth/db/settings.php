@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -29,20 +28,19 @@ if ($ADMIN->fulltree) {
 
     // We use a couple of custom admin settings since we need to massage the data before it is inserted into the DB.
     require_once($CFG->dirroot.'/auth/db/classes/admin_setting_special_auth_configtext.php');
-    
+
     // Needed for constants.
     require_once($CFG->libdir.'/authlib.php');
-    
+
     // Introductory explanation.
     $settings->add(new admin_setting_heading('auth_db/pluginname', '', new lang_string('auth_dbdescription', 'auth_db')));
 
-
-    // Host
+    // Host.
     $settings->add(new admin_setting_configtext('auth_db/host', get_string('auth_dbhost_key', 'auth_db'),
             get_string('auth_dbhost', 'auth_db') . ' ' .get_string('auth_multiplehosts', 'auth'),
             '127.0.0.1', PARAM_RAW));
 
-    // Type
+    // Type.
     $dboptions = array();
     $dbtypes = array("access", "ado_access", "ado", "ado_mssql", "borland_ibase", "csv", "db2",
         "fbsql", "firebird", "ibase", "informix72", "informix", "mssql", "mssql_n", "mssqlnative",
@@ -56,7 +54,7 @@ if ($ADMIN->fulltree) {
         new lang_string('auth_dbtype_key', 'auth_db'),
         new lang_string('auth_dbtype', 'auth_db'), 'mysqli', $dboptions));
 
-    //Sybase quotes.
+    // Sybase quotes.
     $yesno = array(
         new lang_string('no'),
         new lang_string('yes'),
@@ -75,7 +73,7 @@ if ($ADMIN->fulltree) {
 
     // Password.
     $settings->add(new admin_setting_configpasswordunmask('auth_db/pass', get_string('auth_dbpass_key', 'auth_db'),
-            get_string('auth_dbpass', 'auth_db'),''));
+            get_string('auth_dbpass', 'auth_db'), ''));
 
     // DB Table.
     $settings->add(new admin_setting_configtext('auth_db/table', get_string('auth_dbtable_key', 'auth_db'),
@@ -101,7 +99,7 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configselect('auth_db/passtype',
         new lang_string('auth_dbpasstype_key', 'auth_db'), new lang_string('auth_dbpasstype', 'auth_db'), 'plaintext', $passtype));
 
-    // Encoding
+    // Encoding.
     $settings->add(new admin_setting_configtext('auth_db/extencoding', get_string('auth_dbextencoding', 'auth_db'),
             get_string('auth_dbextencodinghelp', 'auth_db'), 'utf-8', PARAM_RAW_TRIMMED));
 
@@ -113,26 +111,28 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configselect('auth_db/debugauthdb',
         new lang_string('auth_dbdebugauthdb', 'auth_db'), new lang_string('auth_dbdebugauthdbhelp', 'auth_db'), 0, $yesno));
 
-    // Password change URL
+    // Password change URL.
     $settings->add(new auth_db_admin_setting_special_auth_configtext('auth_db/changepasswordurl',
             get_string('auth_dbchangepasswordurl_key', 'auth_db'),
             get_string('changepasswordhelp', 'auth'), '', PARAM_URL));
 
-    // Label and Sync Options
+    // Label and Sync Options.
     $settings->add(new admin_setting_heading('auth_db/usersync', new lang_string('auth_sync_script', 'auth'), ''));
 
     // Sync Options.
     $deleteopt = array();
-    $deleteopt[AUTH_REMOVEUSER_KEEP] = get_string('auth_remove_keep','auth');
-    $deleteopt[AUTH_REMOVEUSER_SUSPEND] = get_string('auth_remove_suspend','auth');
-    $deleteopt[AUTH_REMOVEUSER_FULLDELETE] = get_string('auth_remove_delete','auth');
+    $deleteopt[AUTH_REMOVEUSER_KEEP] = get_string('auth_remove_keep', 'auth');
+    $deleteopt[AUTH_REMOVEUSER_SUSPEND] = get_string('auth_remove_suspend', 'auth');
+    $deleteopt[AUTH_REMOVEUSER_FULLDELETE] = get_string('auth_remove_delete', 'auth');
 
     $settings->add(new admin_setting_configselect('auth_db/removeuser',
-        new lang_string('auth_remove_user_key','auth'), new lang_string('auth_remove_user','auth'), AUTH_REMOVEUSER_KEEP, $deleteopt));
-    
+        new lang_string('auth_remove_user_key', 'auth'),
+        new lang_string('auth_remove_user', 'auth'), AUTH_REMOVEUSER_KEEP, $deleteopt));
+
     // Display locking / mapping of profile fields.
     $authplugin = get_auth_plugin($this->name);
-    display_auth_lock_options($settings, $authplugin->authtype, $authplugin->userfields, get_string('auth_dbextrafields', 'auth_db'),
-        true, true, $authplugin->get_custom_user_profile_fields());
+    display_auth_lock_options($settings, $authplugin->authtype, $authplugin->userfields,
+            get_string('auth_dbextrafields', 'auth_db'),
+            true, true, $authplugin->get_custom_user_profile_fields());
 
 }

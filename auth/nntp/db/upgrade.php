@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Function to upgrade auth_nntp.
  * @param int $oldversion the version we are upgrading from
  * @return bool result
  */
@@ -35,10 +36,10 @@ function xmldb_auth_nntp_upgrade($oldversion) {
     // Put any upgrade step following this.
 
     if ($oldversion < 2017020700) {
-        // Convert info in config plugins from auth/nntp to auth_nntp
+        // Convert info in config plugins from auth/nntp to auth_nntp.
         $DB->set_field('config_plugins', 'plugin', 'auth_nntp', array('plugin' => 'auth/nntp'));
         upgrade_plugin_savepoint(true, 2017020700, 'auth', 'nntp');
     }
-    
+
     return true;
 }

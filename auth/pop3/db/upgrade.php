@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Function to upgrade auth_pop3.
  * @param int $oldversion the version we are upgrading from
  * @return bool result
  */
@@ -35,10 +36,10 @@ function xmldb_auth_pop3_upgrade($oldversion) {
     // Put any upgrade step following this.
 
     if ($oldversion < 2017020700) {
-        // Convert info in config plugins from auth/pop3 to auth_pop3
+        // Convert info in config plugins from auth/pop3 to auth_pop3.
         $DB->set_field('config_plugins', 'plugin', 'auth_pop3', array('plugin' => 'auth/pop3'));
         upgrade_plugin_savepoint(true, 2017020700, 'auth', 'pop3');
     }
-    
+
     return true;
 }

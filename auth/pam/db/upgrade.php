@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Function to upgrade auth_pam.
  * @param int $oldversion the version we are upgrading from
  * @return bool result
  */
@@ -35,10 +36,10 @@ function xmldb_auth_pam_upgrade($oldversion) {
     // Put any upgrade step following this.
 
     if ($oldversion < 2017020700) {
-        // Convert info in config plugins from auth/pam to auth_pam
+        // Convert info in config plugins from auth/pam to auth_pam.
         $DB->set_field('config_plugins', 'plugin', 'auth_pam', array('plugin' => 'auth/pam'));
         upgrade_plugin_savepoint(true, 2017020700, 'auth', 'pam');
     }
-    
+
     return true;
 }
