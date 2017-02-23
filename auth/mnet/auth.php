@@ -1139,17 +1139,16 @@ class auth_plugin_mnet extends auth_plugin_base {
 
     /**
      * Test if settings are correct, print info to output.
-     * 
      */
-    function test_settings() {
+    public function test_settings() {
         global $CFG, $OUTPUT, $DB;
-        
+
         // Generate warning if MNET is disabled.
         if (empty($CFG->mnet_dispatcher_mode) || $CFG->mnet_dispatcher_mode !== 'strict') {
-                echo $OUTPUT->notification(get_string('mnetdisabled','mnet'), 'notifyproblem');
+                echo $OUTPUT->notification(get_string('mnetdisabled', 'mnet'), 'notifyproblem');
                 return;
         }
-        
+
         // Generate full list of ID and service providers.
         $query = "
            SELECT
@@ -1193,17 +1192,17 @@ class auth_plugin_mnet extends auth_plugin_base {
            ORDER BY
                h.name ASC";
 
-        $id_providers = array();
-        $service_providers = array();
+        $idproviders = array();
+        $serviceproviders = array();
         if ($resultset = $DB->get_records_sql($query, array($CFG->mnet_localhost_id))) {
-            foreach($resultset as $hostservice) {
-                if(!empty($hostservice->idppublish) && !empty($hostservice->spsubscribe)) {
-                    $service_providers[]= array('id' => $hostservice->id,
+            foreach ($resultset as $hostservice) {
+                if (!empty($hostservice->idppublish) && !empty($hostservice->spsubscribe)) {
+                    $serviceproviders[] = array('id' => $hostservice->id,
                         'name' => $hostservice->hostname,
                         'wwwroot' => $hostservice->wwwroot);
                 }
-                if(!empty($hostservice->idpsubscribe) && !empty($hostservice->sppublish)) {
-                    $id_providers[]= array('id' => $hostservice->id,
+                if (!empty($hostservice->idpsubscribe) && !empty($hostservice->sppublish)) {
+                    $idproviders[] = array('id' => $hostservice->id,
                         'name' => $hostservice->hostname,
                         'wwwroot' => $hostservice->wwwroot);
                 }
@@ -1214,7 +1213,7 @@ class auth_plugin_mnet extends auth_plugin_base {
         $table = html_writer::start_tag('table', array('class' => 'generaltable'));
 
         $count = 0;
-        foreach($id_providers as $host) {
+        foreach ($idproviders as $host) {
             $table .= html_writer::start_tag('tr');
             $table .= html_writer::start_tag('td');
             $table .= $host['name'];
@@ -1236,7 +1235,7 @@ class auth_plugin_mnet extends auth_plugin_base {
         unset($table);
         $table = html_writer::start_tag('table', array('class' => 'generaltable'));
         $count = 0;
-        foreach($service_providers as $host) {
+        foreach ($serviceproviders as $host) {
             $table .= html_writer::start_tag('tr');
             $table .= html_writer::start_tag('td');
             $table .= $host['name'];

@@ -21,6 +21,16 @@
  * @copyright  2017 Stephen Bourget
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Special setting for auth_ldap that cleans up context values on save..
+ *
+ * @package    auth_ldap
+ * @copyright  2017 Stephen Bourget
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class auth_ldap_admin_setting_special_contexts_configtext extends admin_setting_configtext {
 
     /**

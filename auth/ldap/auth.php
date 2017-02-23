@@ -2151,9 +2151,8 @@ class auth_plugin_ldap extends auth_plugin_base {
 
     /**
      * Test if settings are correct, print info to output.
-     * 
      */
-    function test_settings() {
+    public function test_settings() {
         global $OUTPUT;
 
         if (!function_exists('ldap_connect')) { // Is php-ldap really there?
@@ -2162,7 +2161,7 @@ class auth_plugin_ldap extends auth_plugin_base {
         }
 
         // Check to see if this is actually configured.
-        if ((isset($this->config->host_url)) && ($this->config->host_url !== '')) {                
+        if ((isset($this->config->host_url)) && ($this->config->host_url !== '')) {
 
             try {
                 $ldapconn = $this->ldap_connect();
@@ -2178,7 +2177,7 @@ class auth_plugin_ldap extends auth_plugin_base {
             if ((!$pagedresultssupported)) {
                 echo $OUTPUT->notification(get_string('pagedresultsnotsupp', 'auth_ldap'), \core\output\notification::NOTIFY_INFO);
             } else if ($ldapconn) {
-                // We were able to connect successfuly
+                // We were able to connect successfuly.
                 echo $OUTPUT->notification(get_string('connectingldapsuccess', 'auth_ldap'), \core\output\notification::NOTIFY_SUCCESS);
             }
 

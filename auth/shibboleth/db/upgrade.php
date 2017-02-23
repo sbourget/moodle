@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Function to upgrade auth_shibboleth.
  * @param int $oldversion the version we are upgrading from
  * @return bool result
  */
@@ -35,10 +36,10 @@ function xmldb_auth_shibboleth_upgrade($oldversion) {
     // Put any upgrade step following this.
 
     if ($oldversion < 2017020700) {
-        // Convert info in config plugins from auth/shibboleth to auth_shibboleth
+        // Convert info in config plugins from auth/shibboleth to auth_shibboleth.
         $DB->set_field('config_plugins', 'plugin', 'auth_shibboleth', array('plugin' => 'auth/shibboleth'));
         upgrade_plugin_savepoint(true, 2017020700, 'auth', 'shibboleth');
     }
-    
+
     return true;
 }

@@ -96,13 +96,21 @@ exit;
  * but some may want a custom one if they are offering
  * other options
  * Note: lockconfig_ fields have special handling.
+ *
+ * @param string $auth authentication plugin shortname
+ * @param array $user_fields user profile fields
+ * @param string $helptext help text to be displayed at top of form
+ * @param boolean $retrieveopts Map fields or lock only.
+ * @param boolean $updateopts Allow remote updates
+ * @param array $customfields list of custom profile fields
  * @deprecated since Moodle 3.3
  */
 function print_auth_lock_options($auth, $user_fields, $helptext, $retrieveopts, $updateopts, $customfields = array()) {
     global $DB, $OUTPUT;
     debugging("The function 'print_auth_lock_options' has been depreciated, " .
-              "Please migrate your code to use the admin settings API and use the function 'display_auth_lock_options' instead. ", DEBUG_DEVELOPER);
-    
+              "Please migrate your code to use the admin settings API and use the function 'display_auth_lock_options' instead. ",
+              DEBUG_DEVELOPER);
+
     echo '<tr><td colspan="3">';
     if ($retrieveopts) {
         echo $OUTPUT->heading(get_string('auth_data_mapping', 'auth'));

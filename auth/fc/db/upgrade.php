@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Function to upgrade auth_fc.
  * @param int $oldversion the version we are upgrading from
  * @return bool result
  */
@@ -35,10 +36,10 @@ function xmldb_auth_fc_upgrade($oldversion) {
     // Put any upgrade step following this.
 
     if ($oldversion < 2017020700) {
-        // Convert info in config plugins from auth/fc to auth_fc
+        // Convert info in config plugins from auth/fc to auth_fc.
         $DB->set_field('config_plugins', 'plugin', 'auth_fc', array('plugin' => 'auth/fc'));
         upgrade_plugin_savepoint(true, 2017020700, 'auth', 'fc');
     }
-    
+
     return true;
 }

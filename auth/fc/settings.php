@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -32,7 +31,7 @@ if ($ADMIN->fulltree) {
 
     // Host.
     $settings->add(new admin_setting_configtext('auth_fc/host', get_string('auth_fchost_key', 'auth_fc'),
-            get_string('auth_fchost', 'auth_fc'),'127.0.0.1', PARAM_HOST));
+            get_string('auth_fchost', 'auth_fc'), '127.0.0.1', PARAM_HOST));
 
     // Port.
     $settings->add(new admin_setting_configtext('auth_fc/fppport', get_string('auth_fcfppport_key', 'auth_fc'),
@@ -40,15 +39,15 @@ if ($ADMIN->fulltree) {
 
     // User ID.
     $settings->add(new admin_setting_configtext('auth_fc/userid', get_string('auth_fcuserid_key', 'auth_fc'),
-            get_string('auth_fcuserid', 'auth_fc'),'fcMoodle', PARAM_RAW));
+            get_string('auth_fcuserid', 'auth_fc'), 'fcMoodle', PARAM_RAW));
 
     // Password.
     $settings->add(new admin_setting_configpasswordunmask('auth_fc/passwd', get_string('auth_fcpasswd_key', 'auth_fc'),
-            get_string('auth_fcpasswd', 'auth_fc'),''));
+            get_string('auth_fcpasswd', 'auth_fc'), ''));
 
     // Creators.
     $settings->add(new admin_setting_configtext('auth_fc/creators', get_string('auth_fccreators_key', 'auth_fc'),
-            get_string('auth_fccreators', 'auth_fc'),'', PARAM_RAW));
+            get_string('auth_fccreators', 'auth_fc'), '', PARAM_RAW));
 
     // Password change URL.
     $settings->add(new admin_setting_configtext('auth_fc/changepasswordurl',
@@ -57,5 +56,6 @@ if ($ADMIN->fulltree) {
 
     // Display locking / mapping of profile fields.
     $authplugin = get_auth_plugin($this->name);
-    display_auth_lock_options($settings, $authplugin->authtype, $authplugin->userfields, get_string('auth_fieldlocks_help', 'auth'), false, false);
+    display_auth_lock_options($settings, $authplugin->authtype, $authplugin->userfields,
+            get_string('auth_fieldlocks_help', 'auth'), false, false);
 }

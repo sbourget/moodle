@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -31,7 +30,7 @@ if ($ADMIN->fulltree) {
     require_once($CFG->dirroot.'/auth/ldap/classes/admin_setting_special_lowercase_configtext.php');
     require_once($CFG->dirroot.'/auth/ldap/classes/admin_setting_special_contexts_configtext.php');
 
-    //Include needed files.
+    // Include needed files.
     require_once($CFG->dirroot.'/auth/cas/auth.php');
     require_once($CFG->dirroot.'/auth/cas/languages.php');
 
@@ -46,17 +45,17 @@ if ($ADMIN->fulltree) {
     // Hostname.
     $settings->add(new admin_setting_configtext('auth_cas/hostname',
             get_string('auth_cas_hostname_key', 'auth_cas'),
-            get_string('auth_cas_hostname', 'auth_cas'),'', PARAM_RAW_TRIMMED));
+            get_string('auth_cas_hostname', 'auth_cas'), '', PARAM_RAW_TRIMMED));
 
     // Base URI.
     $settings->add(new admin_setting_configtext('auth_cas/baseuri',
             get_string('auth_cas_baseuri_key', 'auth_cas'),
-            get_string('auth_cas_baseuri', 'auth_cas'),'', PARAM_RAW_TRIMMED));
+            get_string('auth_cas_baseuri', 'auth_cas'), '', PARAM_RAW_TRIMMED));
 
     // Port.
     $settings->add(new admin_setting_configtext('auth_cas/port',
             get_string('auth_cas_port_key', 'auth_cas'),
-            get_string('auth_cas_port', 'auth_cas'),'', PARAM_INT));
+            get_string('auth_cas_port', 'auth_cas'), '', PARAM_INT));
 
     // CAS Version.
     $casversions = array();
@@ -69,7 +68,7 @@ if ($ADMIN->fulltree) {
     // Language.
     if (!isset($CASLANGUAGES) || empty($CASLANGUAGES)) {
         // Prevent warnings on other admin pages.
-        // $CASLANGUAGES is defined in /auth/cas/languages.php
+        // $CASLANGUAGES is defined in /auth/cas/languages.php.
         $CASLANGUAGES = array();
         $CASLANGUAGES[PHPCAS_LANG_ENGLISH] = 'English';
         $CASLANGUAGES[PHPCAS_LANG_FRENCH] = 'French';
@@ -87,7 +86,7 @@ if ($ADMIN->fulltree) {
             new lang_string('auth_cas_proxycas_key', 'auth_cas'),
             new lang_string('auth_cas_proxycas', 'auth_cas'), 0 , $yesno));
 
-    //Logout option
+    // Logout option.
     $settings->add(new admin_setting_configselect('auth_cas/logoutcas',
             new lang_string('auth_cas_logoutcas_key', 'auth_cas'),
             new lang_string('auth_cas_logoutcas', 'auth_cas'), 0 , $yesno));
@@ -105,9 +104,9 @@ if ($ADMIN->fulltree) {
     // Certificate path.
     $settings->add(new admin_setting_configfile('auth_cas/certificate_path',
             get_string('auth_cas_certificate_path_key', 'auth_cas'),
-            get_string('auth_cas_certificate_path', 'auth_cas'),''));
+            get_string('auth_cas_certificate_path', 'auth_cas'), ''));
 
-    // cURL SSL version.
+    // CURL SSL version.
     $sslversions = array();
     $sslversions[''] = get_string('auth_cas_curl_ssl_version_default', 'auth_cas');
     if (defined('CURL_SSLVERSION_TLSv1')) {
@@ -135,16 +134,16 @@ if ($ADMIN->fulltree) {
     // Alt Logout URL.
     $settings->add(new admin_setting_configtext('auth_cas/logout_return_url',
             get_string('auth_cas_logout_return_url_key', 'auth_cas'),
-            get_string('auth_cas_logout_return_url', 'auth_cas'),'', PARAM_URL));
+            get_string('auth_cas_logout_return_url', 'auth_cas'), '', PARAM_URL));
 
-    // LDAP server settings
+    // LDAP server settings.
     $settings->add(new admin_setting_heading('auth_cas/ldapserversettings',
             new lang_string('auth_ldap_server_settings', 'auth_ldap'), ''));
 
     // Host.
     $settings->add(new admin_setting_configtext('auth_cas/host_url',
             get_string('auth_ldap_host_url_key', 'auth_ldap'),
-            get_string('auth_ldap_host_url', 'auth_ldap'),'', PARAM_RAW_TRIMMED));
+            get_string('auth_ldap_host_url', 'auth_ldap'), '', PARAM_RAW_TRIMMED));
 
     // Version.
     $versions = array();
@@ -182,7 +181,7 @@ if ($ADMIN->fulltree) {
     // Password.
     $settings->add(new admin_setting_configpasswordunmask('auth_cas/bind_pw',
             get_string('auth_ldap_bind_pw_key', 'auth_ldap'),
-            get_string('auth_ldap_bind_pw', 'auth_ldap'),''));
+            get_string('auth_ldap_bind_pw', 'auth_ldap'), ''));
 
     // User Lookup settings.
     $settings->add(new admin_setting_heading('auth_cas/ldapuserlookup',
@@ -196,14 +195,14 @@ if ($ADMIN->fulltree) {
     // Contexts.
     $settings->add(new auth_ldap_admin_setting_special_contexts_configtext('auth_cas/contexts',
             get_string('auth_ldap_contexts_key', 'auth_ldap'),
-            get_string('auth_ldap_contexts', 'auth_ldap'),'', PARAM_RAW_TRIMMED));
+            get_string('auth_ldap_contexts', 'auth_ldap'), '', PARAM_RAW_TRIMMED));
 
-    // Search subcontexts
+    // Search subcontexts.
     $settings->add(new admin_setting_configselect('auth_cas/search_sub',
             new lang_string('auth_ldap_search_sub_key', 'auth_ldap'),
             new lang_string('auth_ldap_search_sub', 'auth_ldap'), 0 , $yesno));
 
-    // Dereference aliases
+    // Dereference aliases.
     $optderef = array();
     $optderef[LDAP_DEREF_NEVER] = get_string('no');
     $optderef[LDAP_DEREF_ALWAYS] = get_string('yes');
@@ -212,25 +211,25 @@ if ($ADMIN->fulltree) {
             new lang_string('auth_ldap_opt_deref_key', 'auth_ldap'),
             new lang_string('auth_ldap_opt_deref', 'auth_ldap'), LDAP_DEREF_NEVER , $optderef));
 
-    // User attribute
+    // User attribute.
     $settings->add(new auth_ldap_admin_setting_special_lowercase_configtext('auth_cas/user_attribute',
             get_string('auth_ldap_user_attribute_key', 'auth_ldap'),
-            get_string('auth_ldap_user_attribute', 'auth_ldap'),'', PARAM_RAW));
+            get_string('auth_ldap_user_attribute', 'auth_ldap'), '', PARAM_RAW));
 
-    // Member attribute
+    // Member attribute.
     $settings->add(new auth_ldap_admin_setting_special_lowercase_configtext('auth_cas/memberattribute',
             get_string('auth_ldap_memberattribute_key', 'auth_ldap'),
-            get_string('auth_ldap_memberattribute', 'auth_ldap'),'', PARAM_RAW));
+            get_string('auth_ldap_memberattribute', 'auth_ldap'), '', PARAM_RAW));
 
-    // Member attribute uses dn
+    // Member attribute uses dn.
     $settings->add(new admin_setting_configtext('auth_cas/memberattribute_isdn',
             get_string('auth_ldap_memberattribute_isdn_key', 'auth_ldap'),
-            get_string('auth_ldap_memberattribute_isdn', 'auth_ldap'),'', PARAM_RAW));
+            get_string('auth_ldap_memberattribute_isdn', 'auth_ldap'), '', PARAM_RAW));
 
     // Object class.
     $settings->add(new admin_setting_configtext('auth_cas/objectclass',
             get_string('auth_ldap_objectclass_key', 'auth_ldap'),
-            get_string('auth_ldap_objectclass', 'auth_ldap'),'', PARAM_RAW_TRIMMED));
+            get_string('auth_ldap_objectclass', 'auth_ldap'), '', PARAM_RAW_TRIMMED));
 
     // Course Creators Header.
     $settings->add(new admin_setting_heading('auth_cas/coursecreators',
@@ -239,12 +238,12 @@ if ($ADMIN->fulltree) {
     // Course creators attribute field mapping.
     $settings->add(new admin_setting_configtext('auth_cas/attrcreators',
             get_string('auth_ldap_attrcreators_key', 'auth_ldap'),
-            get_string('auth_ldap_attrcreators', 'auth_ldap'),'', PARAM_RAW_TRIMMED));
+            get_string('auth_ldap_attrcreators', 'auth_ldap'), '', PARAM_RAW_TRIMMED));
 
     // Course creator group field mapping.
     $settings->add(new admin_setting_configtext('auth_cas/groupecreators',
             get_string('auth_ldap_groupecreators_key', 'auth_ldap'),
-            get_string('auth_ldap_groupecreators', 'auth_ldap'),'', PARAM_RAW_TRIMMED));
+            get_string('auth_ldap_groupecreators', 'auth_ldap'), '', PARAM_RAW_TRIMMED));
 
     // User Account Sync.
     $settings->add(new admin_setting_heading('auth_cas/syncusers',
@@ -268,6 +267,7 @@ if ($ADMIN->fulltree) {
     $help .= get_string('auth_updateremote_expl', 'auth');
     $help .= '<hr />';
     $help .= get_string('auth_updateremote_ldap', 'auth');
-    display_auth_lock_options($settings, $authplugin->authtype, $authplugin->userfields, $help, true, true, $authplugin->get_custom_user_profile_fields());
+    display_auth_lock_options($settings, $authplugin->authtype, $authplugin->userfields, $help, true, true,
+            $authplugin->get_custom_user_profile_fields());
 
 }
