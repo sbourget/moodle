@@ -29,6 +29,7 @@ if ($ADMIN->fulltree) {
     // We use a couple of custom admin settings since we need to massage the data before it is inserted into the DB.
     require_once($CFG->dirroot.'/auth/ldap/classes/admin_setting_special_lowercase_configtext.php');
     require_once($CFG->dirroot.'/auth/ldap/classes/admin_setting_special_contexts_configtext.php');
+    require_once($CFG->dirroot.'/auth/ldap/classes/admin_setting_special_ntlm_configtext.php');
     
     // We need to use some of the Moodle LDAP constants / functions to create the list of options.
     require_once($CFG->dirroot.'/auth/ldap/auth.php');
@@ -284,7 +285,7 @@ if ($ADMIN->fulltree) {
             new lang_string('auth_ntlmsso_type','auth_ldap'), 'ntlm', $types));
 
     // Remote Username format.
-    $settings->add(new admin_setting_configtext('auth_ldap/ntlmsso_remoteuserformat',
+    $settings->add(new auth_ldap_admin_setting_special_ntlm_configtext('auth_ldap/ntlmsso_remoteuserformat',
             get_string('auth_ntlmsso_remoteuserformat_key', 'auth_ldap'),
             get_string('auth_ntlmsso_remoteuserformat', 'auth_ldap'),'', PARAM_RAW_TRIMMED));
 
