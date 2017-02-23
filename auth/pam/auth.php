@@ -127,13 +127,15 @@ class auth_plugin_pam extends auth_plugin_base {
      * @param array $page An object containing all the data for this page.
      */
     function config_form($config, $err, $user_fields) {
-        include "config.html";
+        debugging('auth_pam has been migrated to settings.php.  Please upgrade your code');
+
     }
 
     /**
      * Processes and stores configuration data for this authentication plugin.
      */
     function process_config($config) {
+        debugging('auth_pam has been migrated to settings.php.  Please upgrade your code');
         return true;
     }
 

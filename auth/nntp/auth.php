@@ -115,29 +115,15 @@ class auth_plugin_nntp extends auth_plugin_base {
      * @param array $page An object containing all the data for this page.
      */
     function config_form($config, $err, $user_fields) {
-        include "config.html";
+        debugging('auth_nntp has been migrated to settings.php.  Please upgrade your code');
+
     }
 
     /**
      * Processes and stores configuration data for this authentication plugin.
      */
     function process_config($config) {
-        // set to defaults if undefined
-        if (!isset ($config->host)) {
-            $config->host = '127.0.0.1';
-        }
-        if (!isset ($config->port)) {
-            $config->port = '119';
-        }
-        if (!isset($config->changepasswordurl)) {
-            $config->changepasswordurl = '';
-        }
-
-        // save settings
-        set_config('host', $config->host, 'auth/nntp');
-        set_config('port', $config->port, 'auth/nntp');
-        set_config('changepasswordurl', $config->changepasswordurl, 'auth/nntp');
-
+        debugging('auth_nntp has been migrated to settings.php.  Please upgrade your code');
         return true;
     }
 

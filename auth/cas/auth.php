@@ -239,23 +239,7 @@ class auth_plugin_cas extends auth_plugin_ldap {
      * @param array $page An object containing all the data for this page.
      */
     function config_form($config, $err, $user_fields) {
-        global $CFG, $OUTPUT;
-
-        if (!function_exists('ldap_connect')) { // Is php-ldap really there?
-            echo $OUTPUT->notification(get_string('auth_ldap_noextension', 'auth_ldap'));
-
-            // Don't return here, like we do in auth/ldap. We cas use CAS without LDAP.
-            // So just warn the user (done above) and define the LDAP constants we use
-            // in config.html, to silence the warnings.
-            if (!defined('LDAP_DEREF_NEVER')) {
-                define ('LDAP_DEREF_NEVER', 0);
-            }
-            if (!defined('LDAP_DEREF_ALWAYS')) {
-                define ('LDAP_DEREF_ALWAYS', 3);
-            }
-        }
-
-        include($CFG->dirroot.'/auth/cas/config.html');
+        debugging('auth_cas has been migrated to settings.php.  Please upgrade your code');
     }
 
     /**
@@ -265,10 +249,7 @@ class auth_plugin_cas extends auth_plugin_ldap {
      * @param array $err array of error messages
      */
     function validate_form($form, &$err) {
-        $certificate_path = trim($form->certificate_path);
-        if ($form->certificate_check && empty($certificate_path)) {
-            $err['certificate_path'] = get_string('auth_cas_certificate_path_empty', 'auth_cas');
-        }
+        debugging('auth_cas has been migrated to settings.php.  Please upgrade your code');
     }
 
     /**
@@ -286,135 +267,7 @@ class auth_plugin_cas extends auth_plugin_ldap {
      */
     function process_config($config) {
 
-        // CAS settings
-        if (!isset($config->hostname)) {
-            $config->hostname = '';
-        }
-        if (!isset($config->port)) {
-            $config->port = '';
-        }
-        if (!isset($config->casversion)) {
-            $config->casversion = '';
-        }
-        if (!isset($config->baseuri)) {
-            $config->baseuri = '';
-        }
-        if (!isset($config->language)) {
-            $config->language = '';
-        }
-        if (!isset($config->proxycas)) {
-            $config->proxycas = '';
-        }
-        if (!isset($config->logoutcas)) {
-            $config->logoutcas = '';
-        }
-        if (!isset($config->multiauth)) {
-            $config->multiauth = '';
-        }
-        if (!isset($config->certificate_check)) {
-            $config->certificate_check = '';
-        }
-        if (!isset($config->certificate_path)) {
-            $config->certificate_path = '';
-        }
-        if (!isset($config->curl_ssl_version)) {
-            $config->curl_ssl_version = '';
-        }
-        if (!isset($config->logout_return_url)) {
-            $config->logout_return_url = '';
-        }
-
-        // LDAP settings
-        if (!isset($config->host_url)) {
-            $config->host_url = '';
-        }
-        if (!isset($config->start_tls)) {
-             $config->start_tls = false;
-        }
-        if (empty($config->ldapencoding)) {
-            $config->ldapencoding = 'utf-8';
-        }
-        if (!isset($config->pagesize)) {
-            $config->pagesize = LDAP_DEFAULT_PAGESIZE;
-        }
-        if (!isset($config->contexts)) {
-            $config->contexts = '';
-        }
-        if (!isset($config->user_type)) {
-            $config->user_type = 'default';
-        }
-        if (!isset($config->user_attribute)) {
-            $config->user_attribute = '';
-        }
-        if (!isset($config->search_sub)) {
-            $config->search_sub = '';
-        }
-        if (!isset($config->opt_deref)) {
-            $config->opt_deref = LDAP_DEREF_NEVER;
-        }
-        if (!isset($config->bind_dn)) {
-            $config->bind_dn = '';
-        }
-        if (!isset($config->bind_pw)) {
-            $config->bind_pw = '';
-        }
-        if (!isset($config->ldap_version)) {
-            $config->ldap_version = '3';
-        }
-        if (!isset($config->objectclass)) {
-            $config->objectclass = '';
-        }
-        if (!isset($config->memberattribute)) {
-            $config->memberattribute = '';
-        }
-
-        if (!isset($config->memberattribute_isdn)) {
-            $config->memberattribute_isdn = '';
-        }
-        if (!isset($config->attrcreators)) {
-            $config->attrcreators = '';
-        }
-        if (!isset($config->groupecreators)) {
-            $config->groupecreators = '';
-        }
-        if (!isset($config->removeuser)) {
-            $config->removeuser = AUTH_REMOVEUSER_KEEP;
-        }
-
-        // save CAS settings
-        set_config('hostname', trim($config->hostname), $this->pluginconfig);
-        set_config('port', trim($config->port), $this->pluginconfig);
-        set_config('casversion', $config->casversion, $this->pluginconfig);
-        set_config('baseuri', trim($config->baseuri), $this->pluginconfig);
-        set_config('language', $config->language, $this->pluginconfig);
-        set_config('proxycas', $config->proxycas, $this->pluginconfig);
-        set_config('logoutcas', $config->logoutcas, $this->pluginconfig);
-        set_config('multiauth', $config->multiauth, $this->pluginconfig);
-        set_config('certificate_check', $config->certificate_check, $this->pluginconfig);
-        set_config('certificate_path', $config->certificate_path, $this->pluginconfig);
-        set_config('curl_ssl_version', $config->curl_ssl_version, $this->pluginconfig);
-        set_config('logout_return_url', $config->logout_return_url, $this->pluginconfig);
-
-        // save LDAP settings
-        set_config('host_url', trim($config->host_url), $this->pluginconfig);
-        set_config('start_tls', $config->start_tls, $this->pluginconfig);
-        set_config('ldapencoding', trim($config->ldapencoding), $this->pluginconfig);
-        set_config('pagesize', (int)trim($config->pagesize), $this->pluginconfig);
-        set_config('contexts', trim($config->contexts), $this->pluginconfig);
-        set_config('user_type', core_text::strtolower(trim($config->user_type)), $this->pluginconfig);
-        set_config('user_attribute', core_text::strtolower(trim($config->user_attribute)), $this->pluginconfig);
-        set_config('search_sub', $config->search_sub, $this->pluginconfig);
-        set_config('opt_deref', $config->opt_deref, $this->pluginconfig);
-        set_config('bind_dn', trim($config->bind_dn), $this->pluginconfig);
-        set_config('bind_pw', $config->bind_pw, $this->pluginconfig);
-        set_config('ldap_version', $config->ldap_version, $this->pluginconfig);
-        set_config('objectclass', trim($config->objectclass), $this->pluginconfig);
-        set_config('memberattribute', core_text::strtolower(trim($config->memberattribute)), $this->pluginconfig);
-        set_config('memberattribute_isdn', $config->memberattribute_isdn, $this->pluginconfig);
-        set_config('attrcreators', trim($config->attrcreators), $this->pluginconfig);
-        set_config('groupecreators', trim($config->groupecreators), $this->pluginconfig);
-        set_config('removeuser', $config->removeuser, $this->pluginconfig);
-
+        debugging('auth_cas has been migrated to settings.php.  Please upgrade your code');
         return true;
     }
 

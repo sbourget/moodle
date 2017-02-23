@@ -627,83 +627,16 @@ class auth_plugin_mnet extends auth_plugin_base {
      * @param array $user_fields
      */
     function config_form($config, $err, $user_fields) {
-        global $CFG, $DB;
+        debugging('auth_mnet has been migrated to settings.php.  Please upgrade your code');
 
-         $query = "
-            SELECT
-                h.id,
-                h.name as hostname,
-                h.wwwroot,
-                h2idp.publish as idppublish,
-                h2idp.subscribe as idpsubscribe,
-                idp.name as idpname,
-                h2sp.publish as sppublish,
-                h2sp.subscribe as spsubscribe,
-                sp.name as spname
-            FROM
-                {mnet_host} h
-            LEFT JOIN
-                {mnet_host2service} h2idp
-            ON
-               (h.id = h2idp.hostid AND
-               (h2idp.publish = 1 OR
-                h2idp.subscribe = 1))
-            INNER JOIN
-                {mnet_service} idp
-            ON
-               (h2idp.serviceid = idp.id AND
-                idp.name = 'sso_idp')
-            LEFT JOIN
-                {mnet_host2service} h2sp
-            ON
-               (h.id = h2sp.hostid AND
-               (h2sp.publish = 1 OR
-                h2sp.subscribe = 1))
-            INNER JOIN
-                {mnet_service} sp
-            ON
-               (h2sp.serviceid = sp.id AND
-                sp.name = 'sso_sp')
-            WHERE
-               ((h2idp.publish = 1 AND h2sp.subscribe = 1) OR
-               (h2sp.publish = 1 AND h2idp.subscribe = 1)) AND
-                h.id != ?
-            ORDER BY
-                h.name ASC";
-
-        $id_providers       = array();
-        $service_providers  = array();
-        if ($resultset = $DB->get_records_sql($query, array($CFG->mnet_localhost_id))) {
-            foreach($resultset as $hostservice) {
-                if(!empty($hostservice->idppublish) && !empty($hostservice->spsubscribe)) {
-                    $service_providers[]= array('id' => $hostservice->id, 'name' => $hostservice->hostname, 'wwwroot' => $hostservice->wwwroot);
-                }
-                if(!empty($hostservice->idpsubscribe) && !empty($hostservice->sppublish)) {
-                    $id_providers[]= array('id' => $hostservice->id, 'name' => $hostservice->hostname, 'wwwroot' => $hostservice->wwwroot);
-                }
-            }
-        }
-
-        include "config.html";
     }
 
     /**
      * Processes and stores configuration data for this authentication plugin.
      */
     function process_config($config) {
-        // set to defaults if undefined
-        if (!isset ($config->rpc_negotiation_timeout)) {
-            $config->rpc_negotiation_timeout = '30';
-        }
-        /*
-        if (!isset ($config->auto_add_remote_users)) {
-            $config->auto_add_remote_users = '0';
-        } See MDL-21327   for why this is commented out
-        set_config('auto_add_remote_users',   $config->auto_add_remote_users,   'auth_mnet');
-        */
+        debugging('auth_mnet has been migrated to settings.php.  Please upgrade your code');
 
-        // save settings
-        set_config('rpc_negotiation_timeout', $config->rpc_negotiation_timeout, 'auth_mnet');
 
         return true;
     }

@@ -26,6 +26,10 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
+
+    // We use a couple of custom admin settings since we need to massage the data before it is inserted into the DB.
+    require_once($CFG->dirroot.'/auth/db/classes/admin_setting_special_auth_configtext.php');
+    
     // Needed for constants.
     require_once($CFG->libdir.'/authlib.php');
     
@@ -103,14 +107,14 @@ if ($ADMIN->fulltree) {
 
     // DB SQL SETUP.
     $settings->add(new admin_setting_configtext('auth_db/setupsql', get_string('auth_dbsetupsql', 'auth_db'),
-            get_string('auth_dbsetupsqlhelp', 'auth_db'), '', PARAM_RAW));
+            get_string('auth_dbsetupsqlhelp', 'auth_db'), '', PARAM_RAW_TRIMMED));
 
     // Debug ADOOB.
     $settings->add(new admin_setting_configselect('auth_db/debugauthdb',
         new lang_string('auth_dbdebugauthdb', 'auth_db'), new lang_string('auth_dbdebugauthdbhelp', 'auth_db'), 0, $yesno));
 
     // Password change URL
-    $settings->add(new admin_setting_configtext('auth_db/changepasswordurl',
+    $settings->add(new auth_db_admin_setting_special_auth_configtext('auth_db/changepasswordurl',
             get_string('auth_dbchangepasswordurl_key', 'auth_db'),
             get_string('changepasswordhelp', 'auth'), '', PARAM_URL));
 

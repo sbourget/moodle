@@ -1824,14 +1824,7 @@ class auth_plugin_ldap extends auth_plugin_base {
      * @param array $page An object containing all the data for this page.
      */
     function config_form($config, $err, $user_fields) {
-        global $CFG, $OUTPUT;
-
-        if (!function_exists('ldap_connect')) { // Is php-ldap really there?
-            echo $OUTPUT->notification(get_string('auth_ldap_noextension', 'auth_ldap'));
-            return;
-        }
-
-        include($CFG->dirroot.'/auth/ldap/config.html');
+        debugging('auth_ldap has been migrated to settings.php.  Please upgrade your code');
     }
 
     /**
@@ -1839,158 +1832,7 @@ class auth_plugin_ldap extends auth_plugin_base {
      */
     function process_config($config) {
         // Set to defaults if undefined
-        if (!isset($config->host_url)) {
-             $config->host_url = '';
-        }
-        if (!isset($config->start_tls)) {
-             $config->start_tls = false;
-        }
-        if (empty($config->ldapencoding)) {
-         $config->ldapencoding = 'utf-8';
-        }
-        if (!isset($config->pagesize)) {
-            $config->pagesize = LDAP_DEFAULT_PAGESIZE;
-        }
-        if (!isset($config->contexts)) {
-             $config->contexts = '';
-        }
-        if (!isset($config->user_type)) {
-             $config->user_type = 'default';
-        }
-        if (!isset($config->user_attribute)) {
-             $config->user_attribute = '';
-        }
-        if (!isset($config->suspended_attribute)) {
-            $config->suspended_attribute = '';
-        }
-        if (!isset($config->sync_suspended)) {
-            $config->sync_suspended = false;
-        }
-        if (!isset($config->search_sub)) {
-             $config->search_sub = '';
-        }
-        if (!isset($config->opt_deref)) {
-             $config->opt_deref = LDAP_DEREF_NEVER;
-        }
-        if (!isset($config->preventpassindb)) {
-             $config->preventpassindb = 0;
-        }
-        if (!isset($config->bind_dn)) {
-            $config->bind_dn = '';
-        }
-        if (!isset($config->bind_pw)) {
-            $config->bind_pw = '';
-        }
-        if (!isset($config->ldap_version)) {
-            $config->ldap_version = '3';
-        }
-        if (!isset($config->objectclass)) {
-            $config->objectclass = '';
-        }
-        if (!isset($config->memberattribute)) {
-            $config->memberattribute = '';
-        }
-        if (!isset($config->memberattribute_isdn)) {
-            $config->memberattribute_isdn = '';
-        }
-        if (!isset($config->creators)) {
-            $config->creators = '';
-        }
-        if (!isset($config->create_context)) {
-            $config->create_context = '';
-        }
-        if (!isset($config->expiration)) {
-            $config->expiration = '';
-        }
-        if (!isset($config->expiration_warning)) {
-            $config->expiration_warning = '10';
-        }
-        if (!isset($config->expireattr)) {
-            $config->expireattr = '';
-        }
-        if (!isset($config->gracelogins)) {
-            $config->gracelogins = '';
-        }
-        if (!isset($config->graceattr)) {
-            $config->graceattr = '';
-        }
-        if (!isset($config->auth_user_create)) {
-            $config->auth_user_create = '';
-        }
-        if (!isset($config->forcechangepassword)) {
-            $config->forcechangepassword = 0;
-        }
-        if (!isset($config->stdchangepassword)) {
-            $config->stdchangepassword = 0;
-        }
-        if (!isset($config->passtype)) {
-            $config->passtype = 'plaintext';
-        }
-        if (!isset($config->changepasswordurl)) {
-            $config->changepasswordurl = '';
-        }
-        if (!isset($config->removeuser)) {
-            $config->removeuser = AUTH_REMOVEUSER_KEEP;
-        }
-        if (!isset($config->ntlmsso_enabled)) {
-            $config->ntlmsso_enabled = 0;
-        }
-        if (!isset($config->ntlmsso_subnet)) {
-            $config->ntlmsso_subnet = '';
-        }
-        if (!isset($config->ntlmsso_ie_fastpath)) {
-            $config->ntlmsso_ie_fastpath = 0;
-        }
-        if (!isset($config->ntlmsso_type)) {
-            $config->ntlmsso_type = 'ntlm';
-        }
-        if (!isset($config->ntlmsso_remoteuserformat)) {
-            $config->ntlmsso_remoteuserformat = '';
-        }
-
-        // Try to remove duplicates before storing the contexts (to avoid problems in sync_users()).
-        $config->contexts = explode(';', $config->contexts);
-        $config->contexts = array_map(create_function('$x', 'return core_text::strtolower(trim($x));'),
-                                      $config->contexts);
-        $config->contexts = implode(';', array_unique($config->contexts));
-
-        // Save settings
-        set_config('host_url', trim($config->host_url), $this->pluginconfig);
-        set_config('start_tls', $config->start_tls, $this->pluginconfig);
-        set_config('ldapencoding', trim($config->ldapencoding), $this->pluginconfig);
-        set_config('pagesize', (int)trim($config->pagesize), $this->pluginconfig);
-        set_config('contexts', $config->contexts, $this->pluginconfig);
-        set_config('user_type', core_text::strtolower(trim($config->user_type)), $this->pluginconfig);
-        set_config('user_attribute', core_text::strtolower(trim($config->user_attribute)), $this->pluginconfig);
-        set_config('suspended_attribute', core_text::strtolower(trim($config->suspended_attribute)), $this->pluginconfig);
-        set_config('sync_suspended', $config->sync_suspended, $this->pluginconfig);
-        set_config('search_sub', $config->search_sub, $this->pluginconfig);
-        set_config('opt_deref', $config->opt_deref, $this->pluginconfig);
-        set_config('preventpassindb', $config->preventpassindb, $this->pluginconfig);
-        set_config('bind_dn', trim($config->bind_dn), $this->pluginconfig);
-        set_config('bind_pw', $config->bind_pw, $this->pluginconfig);
-        set_config('ldap_version', $config->ldap_version, $this->pluginconfig);
-        set_config('objectclass', trim($config->objectclass), $this->pluginconfig);
-        set_config('memberattribute', core_text::strtolower(trim($config->memberattribute)), $this->pluginconfig);
-        set_config('memberattribute_isdn', $config->memberattribute_isdn, $this->pluginconfig);
-        set_config('creators', trim($config->creators), $this->pluginconfig);
-        set_config('create_context', trim($config->create_context), $this->pluginconfig);
-        set_config('expiration', $config->expiration, $this->pluginconfig);
-        set_config('expiration_warning', trim($config->expiration_warning), $this->pluginconfig);
-        set_config('expireattr', core_text::strtolower(trim($config->expireattr)), $this->pluginconfig);
-        set_config('gracelogins', $config->gracelogins, $this->pluginconfig);
-        set_config('graceattr', core_text::strtolower(trim($config->graceattr)), $this->pluginconfig);
-        set_config('auth_user_create', $config->auth_user_create, $this->pluginconfig);
-        set_config('forcechangepassword', $config->forcechangepassword, $this->pluginconfig);
-        set_config('stdchangepassword', $config->stdchangepassword, $this->pluginconfig);
-        set_config('passtype', $config->passtype, $this->pluginconfig);
-        set_config('changepasswordurl', trim($config->changepasswordurl), $this->pluginconfig);
-        set_config('removeuser', $config->removeuser, $this->pluginconfig);
-        set_config('ntlmsso_enabled', (int)$config->ntlmsso_enabled, $this->pluginconfig);
-        set_config('ntlmsso_subnet', trim($config->ntlmsso_subnet), $this->pluginconfig);
-        set_config('ntlmsso_ie_fastpath', (int)$config->ntlmsso_ie_fastpath, $this->pluginconfig);
-        set_config('ntlmsso_type', $config->ntlmsso_type, 'auth/ldap');
-        set_config('ntlmsso_remoteuserformat', trim($config->ntlmsso_remoteuserformat), 'auth/ldap');
+        debugging('auth_ldap has been migrated to settings.php.  Please upgrade your code');
 
         return true;
     }
@@ -2220,12 +2062,7 @@ class auth_plugin_ldap extends auth_plugin_base {
      * @param array $err array of error messages (passed by reference)
      */
     function validate_form($form, &$err) {
-        if ($form->ntlmsso_type == 'ntlm') {
-            $format = trim($form->ntlmsso_remoteuserformat);
-            if (!empty($format) && !preg_match('/%username%/i', $format)) {
-                $err['ntlmsso_remoteuserformat'] = get_string('auth_ntlmsso_missing_username', 'auth_ldap');
-            }
-        }
+        debugging('auth_ldap has been migrated to settings.php.  Please upgrade your code');
     }
 
 
