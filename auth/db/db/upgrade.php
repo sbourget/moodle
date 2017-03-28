@@ -35,7 +35,6 @@ function xmldb_auth_db_upgrade($oldversion) {
     // Automatically generated Moodle v3.2.0 release upgrade line.
     // Put any upgrade step following this.
 
-
     if ($oldversion < 2017032800) {
         // Convert info in config plugins from auth/db to auth_db
         $DB->set_field('config_plugins', 'plugin', 'auth_db', array('plugin' => 'auth/db'));

@@ -661,18 +661,6 @@ class auth_plugin_db extends auth_plugin_base {
         return true;
     }
 
-    /**
-     * A chance to validate form data, and last chance to
-     * do stuff before it is inserted in config_plugin
-     *
-     * @param stfdClass $form
-     * @param array $err errors
-     * @return void
-     */
-     function validate_form($form, &$err) {
-        debugging('auth_db has been migrated to settings.php.  Please upgrade your code');
-    }
-
     function prevent_local_passwords() {
         return !$this->is_internal();
     }
@@ -747,32 +735,6 @@ class auth_plugin_db extends auth_plugin_base {
      */
     function can_reset_password() {
         return $this->is_internal();
-    }
-
-    /**
-     * Prints a form for configuring this authentication plugin.
-     *
-     * This function is called from admin/auth.php, and outputs a full page with
-     * a form for configuring this plugin.
-     *
-     * @param stdClass $config
-     * @param array $err errors
-     * @param array $user_fields
-     * @return void
-     */
-    function config_form($config, $err, $user_fields) {
-        debugging('auth_db has been migrated to settings.php.  Please upgrade your code');
-    }
-
-    /**
-     * Processes and stores configuration data for this authentication plugin.
-     *
-     * @param srdClass $config
-     * @return bool always true or exception
-     */
-    function process_config($config) {
-        debugging('auth_db has been migrated to settings.php.  Please upgrade your code');
-        return true;
     }
 
     /**

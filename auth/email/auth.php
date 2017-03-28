@@ -237,26 +237,6 @@ class auth_plugin_email extends auth_plugin_base {
     }
 
     /**
-     * Prints a form for configuring this authentication plugin.
-     *
-     * This function is called from admin/auth.php, and outputs a full page with
-     * a form for configuring this plugin.
-     *
-     * @param array $page An object containing all the data for this page.
-     */
-    function config_form($config, $err, $user_fields) {
-        debugging('auth_email has been migrated to settings.php.  Please upgrade your code');
-    }
-
-    /**
-     * Processes and stores configuration data for this authentication plugin.
-     */
-    function process_config($config) {
-        debugging('auth_email has been migrated to settings.php.  Please upgrade your code');
-        return true;
-    }
-
-    /**
      * Returns whether or not the captcha element is enabled.
      * @return bool
      */

@@ -137,24 +137,6 @@ class auth_plugin_webservice extends auth_plugin_base {
         return false;
     }
 
-    /**
-     * Prints a form for configuring this authentication plugin.
-     *
-     * This function is called from admin/auth.php, and outputs a full page with
-     * a form for configuring this plugin.
-     *
-     * @param array $page An object containing all the data for this page.
-     */
-    function config_form($config, $err, $user_fields) {
-    }
-
-    /**
-     * Processes and stores configuration data for this authentication plugin.
-     */
-    function process_config($config) {
-        return true;
-    }
-
    /**
      * Confirm the new user as registered. This should normally not be used,
      * but it may be necessary if the user auth_method is changed to manual

@@ -231,28 +231,6 @@ class auth_plugin_cas extends auth_plugin_ldap {
     }
 
     /**
-     * Prints a form for configuring this authentication plugin.
-     *
-     * This function is called from admin/auth.php, and outputs a full page with
-     * a form for configuring this plugin.
-     *
-     * @param array $page An object containing all the data for this page.
-     */
-    function config_form($config, $err, $user_fields) {
-        debugging('auth_cas has been migrated to settings.php.  Please upgrade your code');
-    }
-
-    /**
-     * A chance to validate form data, and last chance to
-     * do stuff before it is inserted in config_plugin
-     * @param object object with submitted configuration settings (without system magic quotes)
-     * @param array $err array of error messages
-     */
-    function validate_form($form, &$err) {
-        debugging('auth_cas has been migrated to settings.php.  Please upgrade your code');
-    }
-
-    /**
      * Returns the URL for changing the user's pw, or empty if the default can
      * be used.
      *
@@ -260,15 +238,6 @@ class auth_plugin_cas extends auth_plugin_ldap {
      */
     function change_password_url() {
         return null;
-    }
-
-    /**
-     * Processes and stores configuration data for this authentication plugin.
-     */
-    function process_config($config) {
-
-        debugging('auth_cas has been migrated to settings.php.  Please upgrade your code');
-        return true;
     }
 
     /**

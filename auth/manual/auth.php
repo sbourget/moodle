@@ -158,22 +158,6 @@ class auth_plugin_manual extends auth_plugin_base {
     }
 
     /**
-     * Prints a form for configuring this authentication plugin.
-     *
-     * This function is called from admin/auth.php, and outputs a full page with
-     * a form for configuring this plugin.
-     *
-     * @param array $config An object containing all the data for this page.
-     * @param string $error
-     * @param array $user_fields
-     * @return void
-     */
-    function config_form($config, $err, $user_fields) {
-        debugging('auth_manual has been migrated to settings.php.  Please upgrade your code');
-
-    }
-
-    /**
      * Return number of days to user password expires.
      *
      * If user password does not expire, it should return 0 or a positive value.
@@ -199,18 +183,6 @@ class auth_plugin_manual extends auth_plugin_base {
         }
 
         return $result;
-    }
-
-    /**
-     * Processes and stores configuration data for this authentication plugin.
-     *
-     * @param stdClass $config
-     * @return void
-     */
-    function process_config($config) {
-        debugging('auth_manual has been migrated to settings.php.  Please upgrade your code');
-
-        return true;
     }
 
    /**

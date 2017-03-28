@@ -1816,28 +1816,6 @@ class auth_plugin_ldap extends auth_plugin_base {
     }
 
     /**
-     * Prints a form for configuring this authentication plugin.
-     *
-     * This function is called from admin/auth.php, and outputs a full page with
-     * a form for configuring this plugin.
-     *
-     * @param array $page An object containing all the data for this page.
-     */
-    function config_form($config, $err, $user_fields) {
-        debugging('auth_ldap has been migrated to settings.php.  Please upgrade your code');
-    }
-
-    /**
-     * Processes and stores configuration data for this authentication plugin.
-     */
-    function process_config($config) {
-        // Set to defaults if undefined
-        debugging('auth_ldap has been migrated to settings.php.  Please upgrade your code');
-
-        return true;
-    }
-
-    /**
      * Get password expiration time for a given user from Active Directory
      *
      * @param string $pwdlastset The time last time we changed the password.
@@ -2052,19 +2030,6 @@ class auth_plugin_ldap extends auth_plugin_base {
         return ldap_find_userdn($ldapconnection, $extusername, $ldap_contexts, $this->config->objectclass,
                                 $this->config->user_attribute, $this->config->search_sub);
     }
-
-
-    /**
-     * A chance to validate form data, and last chance to do stuff
-     * before it is inserted in config_plugin
-     *
-     * @param object object with submitted configuration settings (without system magic quotes)
-     * @param array $err array of error messages (passed by reference)
-     */
-    function validate_form($form, &$err) {
-        debugging('auth_ldap has been migrated to settings.php.  Please upgrade your code');
-    }
-
 
     /**
      * When using NTLM SSO, the format of the remote username we get in

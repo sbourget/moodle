@@ -129,10 +129,11 @@ if ($ADMIN->fulltree) {
         new lang_string('auth_remove_user_key', 'auth'),
         new lang_string('auth_remove_user', 'auth'), AUTH_REMOVEUSER_KEEP, $deleteopt));
 
-    //Update users.
+    // Update users.
     $settings->add(new admin_setting_configselect('auth_db/updateusers',
-        new lang_string('auth_dbupdateusers','auth'), new lang_string('auth_dbupdateusers_description','auth'), 0, $yesno));
-    
+        new lang_string('auth_dbupdateusers', 'auth_db'),
+        new lang_string('auth_dbupdateusers_description', 'auth_db'), 0, $yesno));
+
     // Display locking / mapping of profile fields.
     $authplugin = get_auth_plugin($this->name);
     display_auth_lock_options($settings, $authplugin->authtype, $authplugin->userfields,

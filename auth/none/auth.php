@@ -134,25 +134,6 @@ class auth_plugin_none extends auth_plugin_base {
         return true;
     }
 
-    /**
-     * Prints a form for configuring this authentication plugin.
-     *
-     * This function is called from admin/auth.php, and outputs a full page with
-     * a form for configuring this plugin.
-     *
-     * @param array $page An object containing all the data for this page.
-     */
-    function config_form($config, $err, $user_fields) {
-        debugging('auth_none has been migrated to settings.php.  Please upgrade your code');
-    }
-
-    /**
-     * Processes and stores configuration data for this authentication plugin.
-     */
-    function process_config($config) {
-        return true;
-    }
-
 }
 
 

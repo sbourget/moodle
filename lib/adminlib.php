@@ -6512,9 +6512,8 @@ class admin_setting_manageauths extends admin_setting {
         $usercount = $DB->count_records('user', array('auth'=>'manual', 'deleted'=>0));
         $table->data[] = array($displayname, $usercount, '', '', $settings, '', '');
         $displayname = $displayauths['nologin'];
-        $settings = '';
         $usercount = $DB->count_records('user', array('auth'=>'nologin', 'deleted'=>0));
-        $table->data[] = array($displayname, $usercount, '', '', $settings, '', '');
+        $table->data[] = array($displayname, $usercount, '', '', '', '', '');
 
 
         // iterate through auth plugins and add to the display table

@@ -617,31 +617,6 @@ class auth_plugin_mnet extends auth_plugin_base {
     }
 
     /**
-     * Prints a form for configuring this authentication plugin.
-     *
-     * This function is called from admin/auth.php, and outputs a full page with
-     * a form for configuring this plugin.
-     *
-     * @param object $config
-     * @param object $err
-     * @param array $user_fields
-     */
-    function config_form($config, $err, $user_fields) {
-        debugging('auth_mnet has been migrated to settings.php.  Please upgrade your code');
-
-    }
-
-    /**
-     * Processes and stores configuration data for this authentication plugin.
-     */
-    function process_config($config) {
-        debugging('auth_mnet has been migrated to settings.php.  Please upgrade your code');
-
-
-        return true;
-    }
-
-    /**
      * Poll the IdP server to let it know that a user it has authenticated is still
      * online
      *

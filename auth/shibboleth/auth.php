@@ -244,32 +244,6 @@ class auth_plugin_shibboleth extends auth_plugin_base {
         }
     }
 
-
-
-    /**
-     * Prints a form for configuring this authentication plugin.
-     *
-     * This function is called from admin/auth.php, and outputs a full page with
-     * a form for configuring this plugin.
-     *
-     * @param array $page An object containing all the data for this page.
-     */
-    function config_form($config, $err, $user_fields) {
-        debugging('auth_shibboleth has been migrated to settings.php.  Please upgrade your code');
-
-    }
-
-    /**
-     * Processes and stores configuration data for this authentication plugin.
-     *
-     *
-     * @param object $config Configuration object
-     */
-    function process_config($config) {
-        debugging('auth_shibboleth has been migrated to settings.php.  Please upgrade your code');
-        return true;
-    }
-
     /**
      * Cleans and returns first of potential many values (multi-valued attributes)
      *
