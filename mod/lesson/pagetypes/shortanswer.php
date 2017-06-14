@@ -258,6 +258,8 @@ class lesson_page_type_shortanswer extends lesson_page {
         $answers = $this->get_answers();
         $formattextdefoptions = new stdClass;
         $formattextdefoptions->para = false;  //I'll use it widely in this page
+        $formattextdefoptions->context = $answerpage->context;
+
         foreach ($answers as $answer) {
             $answer = parent::rewrite_answers_urls($answer, false);
             if ($useranswer == null && $i == 0) {

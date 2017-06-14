@@ -121,6 +121,7 @@ class lesson_page_type_multichoice extends lesson_page {
         $formattextdefoptions = new stdClass();
         $formattextdefoptions->noclean = true;
         $formattextdefoptions->para = false;
+        $formattextdefoptions->context = context_module::instance($PAGE->cm->id);
 
         $answers = $this->get_used_answers();
         shuffle($answers);
@@ -165,7 +166,6 @@ class lesson_page_type_multichoice extends lesson_page {
             $wronganswerid = 0;
             // store student's answers for displaying on feedback page
             $result->studentanswer = '';
-            $result->studentanswerformat = FORMAT_HTML;
             foreach ($answers as $answer) {
                 foreach ($studentanswers as $answerid) {
                     if ($answerid == $answer->id) {
@@ -254,8 +254,8 @@ class lesson_page_type_multichoice extends lesson_page {
             }
             $result->newpageid = $answer->jumpto;
             $result->response  = format_text($answer->response, $answer->responseformat, $formattextdefoptions);
-            $result->userresponse = format_text($answer->answer, $answer->answerformat, $formattextdefoptions);
-            $result->studentanswer = $result->userresponse;
+            $result->userresponse = $answer->answer;
+            $result->studentanswer = format_text($answer->answer, $answer->answerformat, $formattextdefoptions);
         }
         return $result;
     }

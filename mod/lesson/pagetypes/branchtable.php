@@ -223,10 +223,14 @@ class lesson_page_type_branchtable extends lesson_page {
     }
 
     public function display_answers(html_table $table) {
+        global $PAGE;
+
         $answers = $this->get_answers();
         $options = new stdClass;
         $options->noclean = true;
         $options->para = false;
+        $options->context = context_module::instance($PAGE->cm->id);
+
         $i = 1;
         foreach ($answers as $answer) {
             if ($answer->answer === '') {

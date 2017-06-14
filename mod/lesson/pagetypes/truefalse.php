@@ -76,10 +76,11 @@ class lesson_page_type_truefalse extends lesson_page {
         return $mform->display();
     }
     public function check_answer() {
-        global $DB, $CFG;
+        global $DB, $CFG, $PAGE;
         $formattextdefoptions = new stdClass();
         $formattextdefoptions->noclean = true;
         $formattextdefoptions->para = false;
+        $formattextdefoptions->context = context_module::instance($PAGE->cm->id);
 
         $answers = $this->get_answers();
         shuffle($answers);
@@ -109,7 +110,8 @@ class lesson_page_type_truefalse extends lesson_page {
         }
         $result->newpageid = $answer->jumpto;
         $result->response  = format_text($answer->response, $answer->responseformat, $formattextdefoptions);
-        $result->studentanswer = $result->userresponse = $answer->answer;
+        $result->userresponse = $answer->answer;
+        $result->studentanswer = format_text($answer->answer, $answer->answerformat, $formattextdefoptions);
         return $result;
     }
 

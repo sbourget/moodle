@@ -72,7 +72,7 @@ class lesson_page_type_numerical extends lesson_page {
         return $mform->display();
     }
     public function check_answer() {
-        global $CFG;
+        global $CFG, $PAGE;
         $result = parent::check_answer();
 
         $mform = new lesson_display_answer_form_shortanswer($CFG->wwwroot.'/mod/lesson/continue.php', array('contents'=>$this->get_contents()));
@@ -82,6 +82,7 @@ class lesson_page_type_numerical extends lesson_page {
         $formattextdefoptions = new stdClass();
         $formattextdefoptions->noclean = true;
         $formattextdefoptions->para = false;
+        $formattextdefoptions->context = context_module::instance($PAGE->cm->id);
 
         // set defaults
         $result->response = '';

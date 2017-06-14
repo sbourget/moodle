@@ -153,8 +153,9 @@ class lesson_page_type_essay extends lesson_page {
         $userresponse->response = '';
         $userresponse->responseformat = FORMAT_HTML;
         $result->userresponse = serialize($userresponse);
-        $result->studentanswerformat = $studentanswerformat;
-        $result->studentanswer = $studentanswer;
+        // Student answer must be cleaned and formatted for output.
+        $context = context_module::instance($PAGE->cm->id);
+        $result->studentanswer = format_text($studentanswer, $studentanswerformat, array('context' => $context, 'para' => true));
         return $result;
     }
     public function update($properties, $context = null, $maxbytes = null) {

@@ -172,6 +172,7 @@ class lesson_page_type_matching extends lesson_page {
         $formattextdefoptions = new stdClass();
         $formattextdefoptions->noclean = true;
         $formattextdefoptions->para = false;
+        $formattextdefoptions->context = context_module::instance($PAGE->cm->id);
 
         $result = parent::check_answer();
 

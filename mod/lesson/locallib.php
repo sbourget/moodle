@@ -4074,23 +4074,12 @@ abstract class lesson_page extends lesson_base {
 
                 $result->feedback .= $OUTPUT->box(format_text($this->get_contents(), $this->properties->contentsformat, $options),
                         'generalbox boxaligncenter');
-                if (isset($result->studentanswerformat)) {
-                    // This is the student's answer so it should be cleaned.
-                    $studentanswer = format_text($result->studentanswer, $result->studentanswerformat,
-                            array('context' => $context, 'para' => true));
-                } else {
-                    $studentanswer = format_string($result->studentanswer);
-                }
+                // The student answer has already be formatted and cleaned by checkanswer.
                 $result->feedback .= '<div class="correctanswer generalbox"><em>'
-                        . get_string("youranswer", "lesson").'</em> : ' . $studentanswer;
-                if (isset($result->responseformat)) {
-                    $result->response = file_rewrite_pluginfile_urls($result->response, 'pluginfile.php', $context->id,
-                            'mod_lesson', 'page_responses', $result->answerid);
-                    $result->feedback .= $OUTPUT->box(format_text($result->response, $result->responseformat, $options)
-                            , $class);
-                } else {
-                    $result->feedback .= $OUTPUT->box($result->response, $class);
-                }
+                        . get_string("youranswer", "lesson").'</em> : ' . $result->studentanswer;
+
+                // The feedback has already been formatted by check_answer.
+                $result->feedback .= $OUTPUT->box($result->response, $class);
                 $result->feedback .= '</div>';
             }
         }
@@ -4456,10 +4445,10 @@ abstract class lesson_page extends lesson_base {
         $result->noanswer        = false;
         $result->correctanswer   = false;
         $result->isessayquestion = false;   // use this to turn off review button on essay questions
-        $result->response        = '';
+        $result->response        = '';      // Use this to store formatted feedback in order to display it on the feedback page.
         $result->newpageid       = 0;       // stay on the page
-        $result->studentanswer   = '';      // use this to store student's answer(s) in order to display it on feedback page
-        $result->userresponse    = null;
+        $result->studentanswer   = '';      // Use this to store formatted student's answer(s) in order to display it on feedback page.
+        $result->userresponse    = null;    // Use this to store student's answers(s) in order to store it in database.
         $result->feedback        = '';
         $result->nodefaultresponse  = false; // Flag for redirecting when default feedback is turned off
         $result->inmediatejump = false; // Flag to detect when we should do a jump from the page without further processing.
