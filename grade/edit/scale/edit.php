@@ -134,6 +134,18 @@ if ($mform->is_cancelled()) {
         $scale->insert();
         $data = file_postupdate_standard_editor($data, 'description', $editoroptions, $systemcontext, 'grade', 'scale', $scale->id);
         $DB->set_field($scale->table, 'description', $data->description, array('id'=>$scale->id));
+        // Trigger the scale created event.
+        if ($scale->standard) {
+            $eventcontext = $systemcontext;
+        } else {
+            $eventcontext = $context;
+        }
+        $event = \core\event\scale_added::create(array(
+            'objectid' => $scale->id,
+            'context' => $eventcontext,
+            'other' => array('courseid' => $scale->courseid),
+        ));
+        $event->trigger();
     } else {
         $data = file_postupdate_standard_editor($data, 'description', $editoroptions, $systemcontext, 'grade', 'scale', $id);
         grade_scale::set_properties($scale, $data);
@@ -143,6 +155,18 @@ if ($mform->is_cancelled()) {
             unset($scale->courseid); // keep previous
         }
         $scale->update();
+        // Trigger the scale updated event.
+        if ($scale->standard) {
+            $eventcontext = $systemcontext;
+        } else {
+            $eventcontext = $context;
+        }
+        $event = \core\event\scale_updated::create(array(
+            'objectid' => $scale->id,
+            'context' => $eventcontext,
+            'other' => array('courseid' => $scale->courseid),
+        ));
+        $event->trigger();
     }
     redirect($returnurl);
 }

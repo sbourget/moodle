@@ -43,6 +43,7 @@ if ($courseid) {
 } else {
     require_once $CFG->libdir.'/adminlib.php';
     admin_externalpage_setup('scales');
+    $context = context_system::instance();
 }
 
 /// return tracking object
@@ -97,6 +98,13 @@ switch ($action) {
             die;
         } else {
             $scale->delete();
+            // Trigger the scale deleted event.
+            $event = \core\event\scale_deleted::create(array(
+                'objectid' => $scaleid,
+                'context' => $context,
+                'other' => array('courseid' => $scale->courseid ?: 0),
+            ));
+            $event->trigger();
         }
         break;
 }
