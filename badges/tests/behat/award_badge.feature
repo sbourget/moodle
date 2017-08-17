@@ -355,3 +355,36 @@ Feature: Award badges
     When I press "Revoke badge"
     And I follow "Course Badge"
     Then I should see "Recipients (0)"
+
+  @javascript
+  Scenario: Award cohort membership badge
+    Given the following "cohorts" exist:
+      | name       | idnumber |
+      | One Cohort | CH1      |
+      | Two Cohort | CH2      |
+    Given the following "users" exist:
+      | username | firstname | lastname | email           |
+      | user1    | First     | User     | first@example.com  |
+      | user2    | Second    | User     | second@example.com |
+    And the following "cohort members" exist:
+      | user  | cohort |
+      | user1 | CH1   |
+      | user2 | CH2   |
+    And I log in as "admin"
+    And I navigate to "Add a new badge" node in "Site administration > Badges"
+    And I set the following fields to these values:
+      | Name | Site Badge |
+      | Description | Site badge description |
+      | issuername | Tester of site badge |
+    And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
+    And I press "Create badge"
+    And I set the field "type" to "Cohort membership"
+    And I set the field "id_cohort_cohorts" to "One Cohort"
+    And I press "Save"
+    And I press "Enable access"
+    When I press "Continue"
+    Then I should see "Recipients (1)"
+    And I log out
+    And I log in as "user1"
+    And I follow "Profile" in the user menu
+    And I should see "Site Badge"
