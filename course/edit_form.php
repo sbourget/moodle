@@ -121,11 +121,11 @@ class course_edit_form extends moodleform {
             }
         }
 
-        $mform->addElement('date_selector', 'startdate', get_string('startdate'));
+        $mform->addElement('date_time_selector', 'startdate', get_string('startdate'));
         $mform->addHelpButton('startdate', 'startdate');
         $mform->setDefault('startdate', time() + 3600 * 24);
 
-        $mform->addElement('date_selector', 'enddate', get_string('enddate'), array('optional' => true));
+        $mform->addElement('date_time_selector', 'enddate', get_string('enddate'), array('optional' => true));
         $mform->addHelpButton('enddate', 'enddate');
 
         $mform->addElement('text','idnumber', get_string('idnumbercourse'),'maxlength="100"  size="10"');
