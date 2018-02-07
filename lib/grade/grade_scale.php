@@ -119,6 +119,22 @@ class grade_scale extends grade_object {
     public function insert($source=null) {
         $this->timecreated = time();
         $this->timemodified = time();
+
+        // Trigger the scale created event.
+        if (!empty($this->standard)) {
+            $eventcontext = context_system::instance();
+        } else {
+            if ((!empty($this->courseid)) && ($this->courseid != SITEID)) {
+                $eventcontext = context_course::instance($this->courseid);
+            } else {
+                $eventcontext = context_system::instance();
+            }
+        }
+        $event = \core\event\scale_created::create(array(
+            'objectid' => $this->id,
+            'context' => $eventcontext
+        ));
+        $event->trigger();
         return parent::insert($source);
     }
 
@@ -130,17 +146,49 @@ class grade_scale extends grade_object {
      */
     public function update($source=null) {
         $this->timemodified = time();
+
+        // Trigger the scale updated event.
+        if (!empty($this->standard)) {
+            $eventcontext = context_system::instance();
+        } else {
+            if ((!empty($this->courseid)) && ($this->courseid != SITEID)) {
+                $eventcontext = context_course::instance($this->courseid);
+            } else {
+                $eventcontext = context_system::instance();
+            }
+        }
+        $event = \core\event\scale_updated::create(array(
+            'objectid' => $this->id,
+            'context' => $eventcontext
+        ));
+        $event->trigger();
         return parent::update($source);
     }
 
     /**
-     * Deletes this outcome from the database.
+     * Deletes this scale from the database.
      *
      * @param string $source from where was the object deleted (mod/forum, manual, etc.)
      * @return bool success
      */
     public function delete($source=null) {
         global $DB;
+
+        // Trigger the scale deleted event.
+        if (!empty($this->standard)) {
+            $eventcontext = context_system::instance();
+        } else {
+            if ((!empty($this->courseid)) && ($this->courseid != SITEID)) {
+                $eventcontext = context_course::instance($this->courseid);
+            } else {
+                $eventcontext = context_system::instance();
+            }
+        }
+        $event = \core\event\scale_deleted::create(array(
+            'objectid' => $this->id,
+            'context' => $eventcontext
+        ));
+        $event->trigger();
         if (parent::delete($source)) {
             $context = context_system::instance();
             $fs = get_file_storage();
