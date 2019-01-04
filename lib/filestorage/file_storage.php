@@ -407,35 +407,51 @@ class file_storage {
 
         $mimetype = $file->get_mimetype();
 
-        if ($mimetype === 'image/gif' or $mimetype === 'image/jpeg' or $mimetype === 'image/png') {
-            // make a preview of the image
-            $data = $this->create_imagefile_preview($file, $mode);
+        if ($mimetype !== 'image/svg+xml') {
+            // Not an SVG, so use GD to make a thumbnail.
+            if ($mimetype === 'image/gif' or $mimetype === 'image/jpeg' or $mimetype === 'image/png') {
+                // make a preview of the image
+                $data = $this->create_imagefile_preview($file, $mode);
 
+            } else {
+                // unable to create the preview of this mimetype yet
+                return false;
+            }
+
+            if (empty($data)) {
+                return false;
+            }
+
+            $context = context_system::instance();
+            $record = array(
+                'contextid' => $context->id,
+                'component' => 'core',
+                'filearea'  => 'preview',
+                'itemid'    => 0,
+                'filepath'  => '/' . trim($mode, '/') . '/',
+                'filename'  => $file->get_contenthash(),
+            );
+
+            $imageinfo = getimagesizefromstring($data);
+            if ($imageinfo) {
+                $record['mimetype'] = $imageinfo['mime'];
+            }
+
+            return $this->create_file_from_string($record, $data);
         } else {
-            // unable to create the preview of this mimetype yet
-            return false;
+            // This is an SVG File.  We can just use the origional.
+            $context = context_system::instance();
+            $record = array(
+                'contextid' => $context->id,
+                'component' => 'core',
+                'filearea'  => 'preview',
+                'itemid'    => 0,
+                'filepath'  => '/' . trim($mode, '/') . '/',
+                'filename'  => $file->get_contenthash(),
+                'mimetype'  => $mimetype,
+            );
+            return $this->create_file_from_string($record, $file);
         }
-
-        if (empty($data)) {
-            return false;
-        }
-
-        $context = context_system::instance();
-        $record = array(
-            'contextid' => $context->id,
-            'component' => 'core',
-            'filearea'  => 'preview',
-            'itemid'    => 0,
-            'filepath'  => '/' . trim($mode, '/') . '/',
-            'filename'  => $file->get_contenthash(),
-        );
-
-        $imageinfo = getimagesizefromstring($data);
-        if ($imageinfo) {
-            $record['mimetype'] = $imageinfo['mime'];
-        }
-
-        return $this->create_file_from_string($record, $data);
     }
 
     /**

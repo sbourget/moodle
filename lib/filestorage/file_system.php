@@ -422,8 +422,17 @@ abstract class file_system {
                 'mimetype'  => image_type_to_mime_type($imageinfo[2]),
             );
         if (empty($image['width']) or empty($image['height']) or empty($image['mimetype'])) {
-            // GD can not parse it, sorry.
-            return false;
+            // GD can not parse it, check to see if it is a SVG File.
+            if(mime_content_type($path) == 'image/svg+xml') {
+                // It's an SVG, so treat it accordingly
+                $svg = simplexml_load_file($path);
+                $attributes = $svg->attributes();
+                $image['width'] = (string)$attributes->width;
+                $image['height'] = (string)$attributes->height;
+                $image['mimetype'] = mime_content_type($path);
+            } else {
+                return false;
+            }
         }
         return $image;
     }
