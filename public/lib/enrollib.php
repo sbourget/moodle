@@ -3660,6 +3660,8 @@ abstract class enrol_plugin {
         $courseroleid = $roleid ?: $instance->roleid;
         $courserole = $DB->get_record('role', ['id' => $courseroleid]);
 
+        $oldforcelang = force_current_language($user->lang);
+
         $a = new stdClass();
         $a->coursename = format_string($course->fullname, true, ['context' => $context, 'escape' => false]);
         $a->courselink = course_get_url($course)->out();
@@ -3697,7 +3699,7 @@ abstract class enrol_plugin {
             $message = str_replace($placeholders, $values, $message);
             if (strpos($message, '<') === false) {
                 // Plain text only.
-                $messagetext = $message;
+                $messagetext = format_string($message, true, ['context' => $context, 'escape' => false]);
                 $messagehtml = text_to_html($messagetext, null, false, true);
             } else {
                 // This is most probably the tag/newline soup known as FORMAT_MOODLE.
@@ -3706,7 +3708,11 @@ abstract class enrol_plugin {
                 $messagetext = html_to_text($messagehtml);
             }
         } else {
-            $messagetext = get_string('customwelcomemessageplaceholder', 'core_enrol', $a);
+            $messagetext = format_string(
+                get_string('customwelcomemessageplaceholder', 'core_enrol', $a),
+                true,
+                ['context' => $context, 'escape' => false]
+            );
             $messagehtml = text_to_html($messagetext, null, false, true);
         }
 
@@ -3715,6 +3721,7 @@ abstract class enrol_plugin {
             context: $context,
         );
         if (!$contact) {
+            force_current_language($oldforcelang);
             // Cannot find the contact to send the message from.
             return;
         }
@@ -3734,6 +3741,7 @@ abstract class enrol_plugin {
         $message->contexturlname = $a->coursename;
 
         message_send($message);
+        force_current_language($oldforcelang);
     }
 
     /**
