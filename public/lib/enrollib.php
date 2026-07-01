@@ -3656,6 +3656,15 @@ abstract class enrol_plugin {
         $course = get_course($instance->courseid);
         $context = context_course::instance($course->id);
 
+        $contact = $this->get_welcome_message_contact(
+            sendoption: $sendoption,
+            context: $context,
+        );
+        if (!$contact) {
+            // Cannot find the contact to send the message from.
+            return;
+        }
+
         // Fallback to the instance role ID if parameter not specified.
         $courseroleid = $roleid ?: $instance->roleid;
         $courserole = $DB->get_record('role', ['id' => $courseroleid]);
@@ -3714,16 +3723,6 @@ abstract class enrol_plugin {
                 ['context' => $context, 'escape' => false]
             );
             $messagehtml = text_to_html($messagetext, null, false, true);
-        }
-
-        $contact = $this->get_welcome_message_contact(
-            sendoption: $sendoption,
-            context: $context,
-        );
-        if (!$contact) {
-            force_current_language($oldforcelang);
-            // Cannot find the contact to send the message from.
-            return;
         }
 
         $message = new \core\message\message();
