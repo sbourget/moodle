@@ -2018,4 +2018,172 @@ calendar,core_calendar|/calendar/view.php?view=month',
         $this->assertCount(1, $files);
         $this->assertEquals('existingboost.scss', reset($files)->get_filename());
     }
+
+    /**
+     * Create a grade item with a single graded user, optionally with a penalty deducted.
+     *
+     * @param int $courseid The course id.
+     * @param float $multfactor The grade item's multiplier.
+     * @param float $plusfactor The grade item's offset.
+     * @param float $deductedmark The mark deducted from the user's grade as a penalty.
+     * @return grade_item The created grade item.
+     */
+    private function create_graded_item_with_penalty(
+        int $courseid,
+        float $multfactor,
+        float $plusfactor,
+        float $deductedmark
+    ): grade_item {
+        $gradeitem = new grade_item();
+        $gradeitem->itemname = 'test grade item';
+        $gradeitem->itemtype = 'manual';
+        $gradeitem->courseid = $courseid;
+        $gradeitem->multfactor = $multfactor;
+        $gradeitem->plusfactor = $plusfactor;
+        $gradeitem->insert();
+
+        $user = $this->getDataGenerator()->create_user();
+        $grade = $gradeitem->get_grade($user->id, true);
+        $grade->rawgrade = 50;
+        $grade->deductedmark = $deductedmark;
+        $grade->update();
+
+        return $gradeitem;
+    }
+
+    /**
+     * Test that courses affected by MDL-88407 are frozen during upgrade.
+     *
+     * @covers ::upgrade_penalty_calculation_freeze
+     */
+    public function test_upgrade_penalty_calculation_freeze(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+
+        require_once($CFG->libdir . '/db/upgradelib.php');
+
+        // Course 1: penalty deducted with default multiplier/offset - affected.
+        $course1 = $this->getDataGenerator()->create_course();
+        $this->create_graded_item_with_penalty($course1->id, 1.0, 0.0, 20.0);
+
+        // Course 2: non-default multiplier/offset, no penalty deducted - not affected.
+        $course2 = $this->getDataGenerator()->create_course();
+        $this->create_graded_item_with_penalty($course2->id, 2.0, 5.0, 0.0);
+
+        // Course 3: non-default multiplier/offset and a penalty deducted - affected.
+        $course3 = $this->getDataGenerator()->create_course();
+        $this->create_graded_item_with_penalty($course3->id, 2.0, 5.0, 20.0);
+
+        upgrade_penalty_calculation_freeze();
+
+        $this->assertEquals(20260808, $CFG->{'gradebook_calculations_freeze_' . $course1->id});
+        $this->assertTrue(empty($CFG->{'gradebook_calculations_freeze_' . $course2->id}));
+        $this->assertEquals(20260808, $CFG->{'gradebook_calculations_freeze_' . $course3->id});
+
+        // Running the script again for an already-frozen course must not overwrite the existing value.
+        set_config('gradebook_calculations_freeze_' . $course3->id, 20150627);
+        upgrade_penalty_calculation_freeze();
+        $this->assertEquals(20150627, $CFG->{'gradebook_calculations_freeze_' . $course3->id});
+
+        // Running the script for a single course only must not affect other courses.
+        set_config('gradebook_calculations_freeze_' . $course3->id, null);
+        $course4 = $this->getDataGenerator()->create_course();
+        $this->create_graded_item_with_penalty($course4->id, 3.0, 1.0, 15.0);
+
+        upgrade_penalty_calculation_freeze($course4->id);
+        $this->assertTrue(empty($CFG->{'gradebook_calculations_freeze_' . $course3->id}));
+        $this->assertEquals(20260808, $CFG->{'gradebook_calculations_freeze_' . $course4->id});
+    }
+
+    /**
+     * Create an Assignment grade item with a submitted, graded latest attempt and a penalised grade_grade.
+     *
+     * @param int $courseid The course id.
+     * @param int $userid The graded user id.
+     * @param float $assigngrade The grade stored in assign_grades, used as the authoritative source.
+     * @param float $storedrawgrade The rawgrade to store directly in grade_grades, simulating the legacy state.
+     * @return grade_item The Assignment's grade item.
+     */
+    private function create_penalised_assignment_grade(
+        int $courseid,
+        int $userid,
+        float $assigngrade,
+        float $storedrawgrade,
+    ): grade_item {
+        global $DB;
+
+        $assign = $this->getDataGenerator()->create_module('assign', [
+            'course' => $courseid,
+            'grade' => 200,
+        ]);
+
+        $now = time();
+        $DB->insert_record('assign_submission', (object) [
+            'assignment' => $assign->id,
+            'userid' => $userid,
+            'timecreated' => $now,
+            'timemodified' => $now,
+            'status' => 'submitted',
+            'groupid' => 0,
+            'attemptnumber' => 0,
+            'latest' => 1,
+        ]);
+        $grader = $this->getDataGenerator()->create_user();
+        $DB->insert_record('assign_grades', (object) [
+            'assignment' => $assign->id,
+            'userid' => $userid,
+            'timecreated' => $now,
+            'timemodified' => $now,
+            'grader' => $grader->id,
+            'grade' => $assigngrade,
+            'attemptnumber' => 0,
+        ]);
+
+        $gradeitem = grade_item::fetch([
+            'courseid' => $courseid,
+            'itemtype' => 'mod',
+            'itemmodule' => 'assign',
+            'iteminstance' => $assign->id,
+            'itemnumber' => 0,
+        ]);
+        $grade = $gradeitem->get_grade($userid, true);
+        $grade->rawgrade = $storedrawgrade;
+        $grade->deductedmark = 20;
+        $grade->finalgrade = $storedrawgrade;
+        $grade->update();
+
+        return $gradeitem;
+    }
+
+    /**
+     * Test that Assignment grades are only frozen when the stored rawgrade differs from the authoritative
+     * Assignment grade, rather than based on deductedmark alone.
+     *
+     * @covers ::upgrade_penalty_calculation_freeze
+     */
+    public function test_upgrade_penalty_calculation_freeze_assignment_precision(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+
+        require_once($CFG->libdir . '/db/upgradelib.php');
+
+        $user = $this->getDataGenerator()->create_user();
+
+        // Course 1: The stored rawgrade differs from Assignment's authoritative grade, so the course
+        // must be frozen.
+        $course1 = $this->getDataGenerator()->create_course();
+        $this->create_penalised_assignment_grade($course1->id, $user->id, assigngrade: 50, storedrawgrade: 85);
+
+        // Course 2: The stored rawgrade matches Assignment's authoritative grade, so the course must not
+        // be frozen even though deductedmark is set.
+        $course2 = $this->getDataGenerator()->create_course();
+        $this->create_penalised_assignment_grade($course2->id, $user->id, assigngrade: 50, storedrawgrade: 50);
+
+        upgrade_penalty_calculation_freeze();
+
+        $this->assertEquals(20260808, $CFG->{'gradebook_calculations_freeze_' . $course1->id});
+        $this->assertFalse(isset($CFG->{'gradebook_calculations_freeze_' . $course2->id}));
+    }
 }
