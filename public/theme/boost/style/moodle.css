@@ -37001,10 +37001,36 @@ body.editing#page-course-learningoutcomes .activity-item:hover:not(:has(.activit
 
 /* Option summary styles. */
 .modchooser .optionsummary {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
+  border: var(--mds-stroke-weight-sm) solid var(--mds-border-subtle);
+  border-radius: var(--mds-border-radius-xl);
+  background-color: var(--mds-bg-surface-subtle);
+  padding-block: var(--mds-spacing-md);
+}
+.modchooser .optionsummary [data-region=chooser-option-summary-content-container] {
+  min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  width: 100%;
-  background-color: var(--bs-white);
+  padding-inline: var(--mds-spacing-md);
+  scrollbar-width: thin;
+  scrollbar-color: var(--bs-gray-600) var(--mds-bg-surface-subtle);
+}
+.modchooser .optionsummary [data-region=chooser-option-summary-content-container]::-webkit-scrollbar {
+  width: 12px;
+}
+.modchooser .optionsummary [data-region=chooser-option-summary-content-container]::-webkit-scrollbar-track {
+  background: var(--mds-bg-surface-subtle);
+}
+.modchooser .optionsummary [data-region=chooser-option-summary-content-container]::-webkit-scrollbar-thumb {
+  background-color: var(--bs-gray-600);
+  border-radius: 20px;
+  border: 3px solid var(--mds-bg-surface-subtle);
+}
+.modchooser .optionsummary [data-region=chooser-option-summary-content-container]::-webkit-scrollbar-thumb:hover {
+  background-color: var(--bs-gray-700);
 }
 .modchooser .optionsummary .activitychooser-option-details {
   min-width: 15rem;
@@ -37033,10 +37059,12 @@ body.editing#page-course-learningoutcomes .activity-item:hover:not(:has(.activit
   .modchooser .modal-body .carousel,
   .modchooser .modal-body .carousel-inner,
   .modchooser .modal-body .carousel-item,
-  .modchooser .modal-body .optionsummary,
   .modchooser .modal-body .searchresultitemscontainer-wrapper {
     height: 100%;
     overflow-y: auto;
+  }
+  .modchooser .modal-body .optionsummary {
+    height: 100%;
   }
   .modchoosercontainer,
   .optionscontainer,
