@@ -46206,37 +46206,30 @@ div.editor_atto_toolbar button .icon {
   .path-admin-reportbuilder.pagelayout-popup.behat-site .fixed-top {
     position: fixed;
   }
-  .path-admin-reportbuilder.pagelayout-popup #region-main {
+  .path-admin-reportbuilder.pagelayout-popup #region-main,
+  .path-admin-reportbuilder.pagelayout-popup #page-content {
     border: none;
-    padding: 0;
+    padding: 0 !important; /* stylelint-disable-line declaration-no-important */
   }
   .path-admin-reportbuilder.pagelayout-popup #maincontent {
     visibility: hidden;
   }
-  .path-admin-reportbuilder.pagelayout-popup .dynamictabs .nav-tabs {
-    position: fixed;
-    z-index: 1030;
-    width: calc(100% - 35px);
-    padding-top: 1.25rem;
-    background-color: var(--bs-white);
-    box-shadow: 0 1.25rem 0 var(--bs-white);
-  }
-  .path-admin-reportbuilder.pagelayout-popup .dynamictabs .tab-content {
-    padding-top: 83px;
+  .path-admin-reportbuilder.pagelayout-popup .nav-tabs {
+    padding-top: 1.5rem;
   }
   .path-admin-reportbuilder.pagelayout-popup .reportbuilder-sidebar-menu {
     position: fixed;
   }
   .path-admin-reportbuilder.pagelayout-popup .reportbuilder-sidebar-menu .reportbuilder-sidebar-menu-cards {
-    max-height: calc(100vh - 163px - 52px);
+    max-height: calc(100vh - calc(60px + calc(44px + 3rem)) - calc(38px + 1rem));
   }
   .path-admin-reportbuilder.pagelayout-popup .reportbuilder-sidebar-settings {
     position: fixed;
-    right: 30px;
-    max-height: calc(100vh - 163px);
+    right: 1.5rem;
+    max-height: calc(100vh - calc(60px + calc(44px + 3rem)));
   }
   .path-admin-reportbuilder.pagelayout-popup .reportbuilder-report[data-editing] .reportbuilder-report-container {
-    max-height: calc(100vh - 163px);
+    max-height: calc(100vh - calc(60px + calc(44px + 3rem)));
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--bs-gray-600) #f8f9fa;
