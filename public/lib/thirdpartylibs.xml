@@ -778,7 +778,7 @@ All rights reserved.</copyright>
   <library>
       <location>slim/slim</location>
       <name>Slim Framework</name>
-      <version>4.15.1</version>
+      <version>4.15.2</version>
       <license>MIT</license>
       <repository>https://github.com/slimphp/Slim</repository>
   </library>
