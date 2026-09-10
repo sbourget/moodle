@@ -19,6 +19,9 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - `email_to_user()` now emits a hook `before_email_to_user`. This hook allows any subscriber to modify the email contents, add additional headers, or add reasons to block the email. If any block reasons are added, the email is stopped from being sent and the reasons are output.
 
   For more information see [MDL-69724](https://tracker.moodle.org/browse/MDL-69724)
+- A new Behat step `I set the focus on the "<element>" "<selector>"` has been added to move keyboard focus onto an element without activating it.
+
+  For more information see [MDL-84065](https://tracker.moodle.org/browse/MDL-84065)
 - Token endpoint security improvements: earlier service validation, GET parameter sanitization. The 'appsitecheck' parameter has been removed from the token endpoint.
 
   For more information see [MDL-87010](https://tracker.moodle.org/browse/MDL-87010)
@@ -189,6 +192,9 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - The `\core\task\manager::set_scheduled_task_nextruntime()` method now returns a boolean indicating whether the next run time was updated. It returns `false` when the scheduled task is already running.
 
   For more information see [MDL-89200](https://tracker.moodle.org/browse/MDL-89200)
+- Uninstalling a block plugin no longer deletes its instances synchronously. \core\plugininfo\block::uninstall_cleanup() now queues the new \core\task\delete_block_instances_task ad-hoc task, which deletes the instances and their related data (contexts, positions, user preferences and search index entries) in batches. This makes block removal upgrade steps and plugin uninstallation effectively instant on large sites. Remaining instances are not displayed anywhere once the block record has been deleted.
+
+  For more information see [MDL-89289](https://tracker.moodle.org/browse/MDL-89289)
 - The primary navigation in the Boost navbar is now rendered by the `core/nav/PrimaryNav` React component via the new `core/primarymoremenu` template, replacing `core/moremenu`. With JavaScript enabled the markup no longer includes the `.moremenu` wrapper, and navigation items are rendered as `a.mds-nav-pill` (selected items carry `.mds-nav-pill--selected` and `aria-current="page"`) instead of `a.nav-link.active`. Themes and plugins that style or script `.primary-navigation .moremenu` or `.primary-navigation .nav-link` need updating. A server-rendered `core/moremenu_children` fallback is still emitted inside the mount point for non-JavaScript clients.
 
   For more information see [MDL-89294](https://tracker.moodle.org/browse/MDL-89294)
@@ -579,6 +585,9 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
         `lib/templates/action_bar.mustache` to enable usage across multiple components.
 
   For more information see [MDL-81096](https://tracker.moodle.org/browse/MDL-81096)
+- Courses containing a grade with a penalty deducted from it are now frozen on upgrade to prevent existing grades from being changed unexpectedly by a regrade (see MDL-88407). Courses with no grades identified as affected are not frozen. The pre-MDL-88407 calculation is retained until a user with the `moodle/grade:manage` capability reviews the affected grades and chooses whether to keep the existing grades or apply the fix. When the fix is applied, Assignment grades are used as the authoritative source to restore the affected `rawgrade` values before normal gradebook processing recalculates the final grades. Grades from other activity modules cannot be confidently identified as affected but are still recalculated with the fixed formula once the fix is applied, as every grade item in the course is regraded at that point.
+
+  For more information see [MDL-89497](https://tracker.moodle.org/browse/MDL-89497)
 
 #### Deprecated
 
